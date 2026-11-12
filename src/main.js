@@ -29,6 +29,7 @@ const routes = {
 
 let currentView = null;
 let currentViewInstance = null;
+let currentLayout = null;
 
 function getRoute() {
   const hash = window.location.hash.slice(1) || '';
@@ -58,33 +59,31 @@ async function navigate() {
   // Mostrar layout base si es dashboard, sino vista completa
   if (route === 'dashboard' || route === '') {
     main.innerHTML = '';
-    const layout = DashboardLayout({});
-    main.appendChild(layout);
+    currentLayout = DashboardLayout({});
+    main.appendChild(currentLayout);
     
     // Renderizar DashboardView dentro del layout
     const dashboardContent = main.querySelector('[data-dashboard-content]');
     if (dashboardContent) {
-      currentViewInstance = new ViewClass({ db, params });
+      currentViewInstance = new ViewClass({ db, onNavigate: goTo });
       const viewElement = currentViewInstance.render();
       dashboardContent.appendChild(viewElement);
     }
   } else {
     // Vistas expandidas (pantalla completa)
     main.innerHTML = '';
-    currentViewInstance = new ViewClass({ db, params });
+    currentViewInstance = new ViewClass({ db, onNavigate: goTo });
     const viewElement = currentViewInstance.render();
     main.appendChild(viewElement);
   }
   
   currentView = route;
   
-  // Actualizar header (estado activo)
-  updateHeaderActive(route);
+  // Actualizar header (estado activo) - se hace via store subscription
 }
 
 function updateHeaderActive(route) {
   // El header se actualiza solo via store subscription
-  // Pero podemos forzar re-render si needed
 }
 
 // Escuchar cambios de hash
@@ -95,6 +94,49 @@ export function goTo(route, params = []) {
   const hash = params.length > 0 ? `${route}/${params.join('/')}` : route;
   window.location.hash = hash;
 }
+
+// ============================================
+// EVENTOS GLOBALES PARA ACCIONES RÁPIDAS
+// ============================================
+
+window.addEventListener('app:add-task', () => {
+  if (currentView === 'tasks' && currentViewInstance?.taskList) {
+    const btn = currentViewInstance.taskList.querySelector('[data-add-task]');
+    btn?.click();
+  } else if (currentView === 'dashboard') {
+    goTo('tasks');
+    // Trigger después de navegación
+    setTimeout(() => {
+      const event = new CustomEvent('app:add-task');
+      window.dispatchEvent(event);
+    }, 100);
+  } else {
+    goTo('tasks');
+  }
+});
+
+window.addEventListener('app:add-note', () => {
+  if (currentView === 'notes' && currentViewInstance) {
+    currentViewInstance.createNote?.();
+  } else {
+    goTo('notes');
+  }
+});
+
+window.addEventListener('app:add-goal', () => {
+  if (currentView === 'goals' && currentViewInstance) {
+    currentViewInstance.openGoalModal?.();
+  } else {
+    goTo('goals');
+  }
+});
+
+window.addEventListener('app:search-notes', (e) => {
+  if (currentView === 'notes' && currentViewInstance) {
+    currentViewInstance.searchQuery = e.detail;
+    currentViewInstance.refreshList?.();
+  }
+});
 
 // ============================================
 // INICIALIZACIÓN
@@ -125,6 +167,7 @@ async function init() {
   }
   
   console.log('[App] Inicializado ✓');
+  console.log('[App] Atajos: D=Dashboard, 1=Tareas, 2=Notas, 3=Metas, T=Tema, ?=Ayuda');
 }
 
 // Auto-inicializar cuando DOM listo
