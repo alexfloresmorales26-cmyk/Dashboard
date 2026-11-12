@@ -4,7 +4,7 @@
 
 import { GoalCard } from './GoalCard.js';
 import { GoalForm } from './GoalForm.js';
-import { db } from '../../../store/index.js';
+import { db } from '../../store/index.js';
 
 const ICONS = {
   plus: '<svg class="icon icon--md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
@@ -188,18 +188,18 @@ export function GoalsTracker({ compact = false, maxItems = null, onNavigate }) {
               </div>
               <div>
                 <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--color-warning);">${Math.max(...goal.completedDates.map(d => {
-                  const dates = goal.completedDates.sort();
-                  let maxStreak = 1, current = 1;
-                  for (let i = 1; i < dates.length; i++) {
-                    const prev = new Date(dates[i-1]);
-                    const curr = new Date(dates[i]);
-                    const diff = (curr - prev) / (1000*60*60*24);
-                    if (diff === 1) current++;
-                    else current = 1;
-                    maxStreak = Math.max(maxStreak, current);
-                  }
-                  return maxStreak;
-                }), 0)}</div>
+    const dates = goal.completedDates.sort();
+    let maxStreak = 1, current = 1;
+    for (let i = 1; i < dates.length; i++) {
+      const prev = new Date(dates[i-1]);
+      const curr = new Date(dates[i]);
+      const diff = (curr - prev) / (1000*60*60*24);
+      if (diff === 1) current++;
+      else current = 1;
+      maxStreak = Math.max(maxStreak, current);
+    }
+    return maxStreak;
+  }), 0)}</div>
                 <div style="font-size: var(--font-size-xs); color: var(--color-fg-muted);">Mejor racha</div>
               </div>
             </div>

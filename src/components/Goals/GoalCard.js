@@ -2,8 +2,8 @@
  * GoalCard - Tarjeta de meta con anillo SVG progreso, streak, increment/decrement
  */
 
-import { formatRelativeDate } from '../../../utils/date.js';
-import { ICONS } from '../../Header/Header.js';
+import { formatRelativeDate } from '../../utils/date.js';
+import { ICONS } from '../Header/Header.js';
 
 const ICONS_EXTRA = {
   fire: '<svg class="icon icon--xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2.01-1-3A2.5 2.5 0 0 1 13.5 5c0 1.38.5 2.01 1 3a2.5 2.5 0 0 0-5 0"/><path d="M15 12a2.5 2.5 0 0 0 2.5-2.5c0-1.38-.5-2.01-1-3A2.5 2.5 0 0 0 13.5 5c0 1.38.5 2.01 1 3a2.5 2.5 0 0 1 5 0"/></svg>',

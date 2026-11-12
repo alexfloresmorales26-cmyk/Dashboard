@@ -83,7 +83,7 @@ export function renderMarkdownSync(markdown) {
   
   if (!marked || !DOMPurify) {
     // Placeholder mientras cargan las librerías
-    return `<div class="markdown-loading">Cargando preview...</div>`;
+    return '<div class="markdown-loading">Cargando preview...</div>';
   }
   
   const rawHtml = marked.parse(markdown);

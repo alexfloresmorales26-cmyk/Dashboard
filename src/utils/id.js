@@ -20,7 +20,7 @@ export function nanoid(size = customDefaultSize, alphabet = customAlphabet) {
   const mask = (2 << Math.log2(alphabet.length - 1)) - 1;
   
   for (let i = 0; i < size; i++) {
-    let byte = bytes[i] & mask;
+    const byte = bytes[i] & mask;
     if (byte < alphabet.length) {
       id += alphabet[byte];
     } else {

@@ -4,9 +4,9 @@
 
 import { TaskItem } from './TaskItem.js';
 import { TaskForm } from './TaskForm.js';
-import { formatRelativeDate, todayString } from '../../../utils/date.js';
-import { db } from '../../../store/index.js';
-import { ICONS } from '../../Header/Header.js';
+import { formatRelativeDate, todayString } from '../../utils/date.js';
+import { db } from '../../store/index.js';
+import { ICONS } from '../Header/Header.js';
 
 const ICONS_EXTRA = {
   filter: '<svg class="icon icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>',
@@ -25,7 +25,7 @@ export function TaskList({
   container.className = 'task-list';
   
   // Estado local de filtros
-  let filters = { status: showCompleted ? 'completed' : 'active', priority: '', category: '', search: '' };
+  const filters = { status: showCompleted ? 'completed' : 'active', priority: '', category: '', search: '' };
   let draggedItem = null;
   let tasks = [];
   

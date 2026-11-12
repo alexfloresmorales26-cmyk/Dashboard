@@ -2,8 +2,8 @@
  * NoteCard - Tarjeta de nota para lista (preview, tags, pinned)
  */
 
-import { getFirstParagraph, formatRelativeDate } from '../../../utils/date.js';
-import { ICONS } from '../../Header/Header.js';
+import { getFirstParagraph, formatRelativeDate } from '../../utils/date.js';
+import { ICONS } from '../Header/Header.js';
 
 const ICONS_EXTRA = {
   pin: '<svg class="icon icon--xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M9 11a6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6-6"/></svg>',

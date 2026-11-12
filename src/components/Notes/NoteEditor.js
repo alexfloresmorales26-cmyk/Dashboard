@@ -3,8 +3,8 @@
  * Toolbar, atajos teclado, auto-guardado, sanitizado XSS
  */
 
-import { renderMarkdownSync } from '../../../utils/markdown.js';
-import { db } from '../../../store/index.js';
+import { renderMarkdownSync } from '../../utils/markdown.js';
+import { db } from '../../store/index.js';
 
 const ICONS = {
   bold: '<strong style="font-size: 14px;">B</strong>',
