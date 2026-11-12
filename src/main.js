@@ -62,13 +62,10 @@ async function navigate() {
     currentLayout = DashboardLayout({});
     main.appendChild(currentLayout);
     
-    // Renderizar DashboardView dentro del layout
-    const dashboardContent = main.querySelector('[data-dashboard-content]');
-    if (dashboardContent) {
-      currentViewInstance = new ViewClass({ db, onNavigate: goTo });
-      const viewElement = currentViewInstance.render();
-      dashboardContent.appendChild(viewElement);
-    }
+    // Renderizar DashboardView (se conecta al layout existente)
+    currentViewInstance = new ViewClass({ db, onNavigate: goTo });
+    const viewElement = currentViewInstance.render();
+    main.appendChild(viewElement); // Se adjunta al main, pero DashboardView usa contenedores del layout
   } else {
     // Vistas expandidas (pantalla completa)
     main.innerHTML = '';
@@ -78,8 +75,6 @@ async function navigate() {
   }
   
   currentView = route;
-  
-  // Actualizar header (estado activo) - se hace via store subscription
 }
 
 function updateHeaderActive(route) {
@@ -105,10 +100,8 @@ window.addEventListener('app:add-task', () => {
     btn?.click();
   } else if (currentView === 'dashboard') {
     goTo('tasks');
-    // Trigger después de navegación
     setTimeout(() => {
-      const event = new CustomEvent('app:add-task');
-      window.dispatchEvent(event);
+      window.dispatchEvent(new CustomEvent('app:add-task'));
     }, 100);
   } else {
     goTo('tasks');

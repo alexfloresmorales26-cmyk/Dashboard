@@ -26,12 +26,24 @@ export class DashboardView {
     this.db = store;
     this.onNavigate = onNavigate;
     this.unsubscribers = [];
-    this.element = null;
     this.widgetElements = {};
+    this.containers = {}; // Referencias a contenedores DOM
   }
   
   render() {
-    this.element = document.createDocumentFragment();
+    // Crear elemento contenedor principal (no DocumentFragment)
+    this.element = document.createElement('div');
+    this.element.className = 'dashboard-view';
+    this.element.innerHTML = `
+      <div class="dashboard-view__widgets" style="display: contents;">
+        <!-- Los widgets se renderizan dentro del layout existente -->
+      </div>
+    `;
+    
+    // Obtener referencias a contenedores DEL LAYOUT (ya en el DOM)
+    this.containers.tasks = document.querySelector('[data-widget-content="tasks"]');
+    this.containers.notes = document.querySelector('[data-widget-content="notes"]');
+    this.containers.goals = document.querySelector('[data-widget-content="goals"]');
     
     // Renderizar cada widget en su contenedor
     this.renderTasksWidget();
@@ -57,7 +69,7 @@ export class DashboardView {
   // ============================================
   
   renderTasksWidget() {
-    const container = document.querySelector('[data-widget-content="tasks"]');
+    const container = this.containers.tasks;
     if (!container) return;
     
     // Limpiar y renderizar TaskList compacto
@@ -79,7 +91,7 @@ export class DashboardView {
   // ============================================
   
   renderNotesWidget() {
-    const container = document.querySelector('[data-widget-content="notes"]');
+    const container = this.containers.notes;
     if (!container) return;
     
     const notes = this.db.notes.getAll();
@@ -132,7 +144,7 @@ export class DashboardView {
   // ============================================
   
   renderGoalsWidget() {
-    const container = document.querySelector('[data-widget-content="goals"]');
+    const container = this.containers.goals;
     if (!container) return;
     
     const goals = this.db.goals.getToday();
@@ -166,7 +178,7 @@ export class DashboardView {
     const card = GoalCard({
       goal,
       onIncrement: (id) => this.db.goals.incrementProgress(id),
-      onDecrement: () => {}, // No decrement en compact
+      onDecrement: () => {},
       onEdit: () => window.location.hash = 'goals',
       onReset: () => {},
       onDelete: () => {},
@@ -201,6 +213,7 @@ export class DashboardView {
     this.unsubscribers.forEach(unsub => unsub());
     Object.values(this.widgetElements).forEach(w => w.destroy?.());
     this.widgetElements = {};
+    this.containers = {};
     this.element = null;
   }
 }
