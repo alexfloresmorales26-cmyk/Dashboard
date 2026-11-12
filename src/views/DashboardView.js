@@ -9,6 +9,7 @@ import { getFirstParagraph } from '../utils/markdown.js';
 import { nanoid } from '../utils/id.js';
 import { ICONS } from '../components/Header/Header.js';
 import { TaskList } from '../components/TaskList/TaskList.js';
+import { NoteCard } from '../components/Notes/NoteCard.js';
 
 const ICONS_EXTRA = {
   plus: '<svg class="icon icon--md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
@@ -73,7 +74,7 @@ export class DashboardView {
   }
   
   // ============================================
-  // WIDGET NOTAS
+  // WIDGET NOTAS - Usa NoteCard
   // ============================================
   
   renderNotesWidget() {
@@ -96,41 +97,22 @@ export class DashboardView {
       </div>
     `;
     
-    // Event listeners
-    container.querySelectorAll('[data-note-id]').forEach(el => {
-      el.addEventListener('click', () => {
-        const id = el.dataset.noteId;
-        window.location.hash = `notes/${id}`;
-      });
-    });
-    
+    // Event listeners para navegación
     container.querySelector('[data-nav="notes"]')?.addEventListener('click', () => {
       this.onNavigate?.('notes');
     });
   }
   
   renderNoteCard(note) {
-    const preview = getFirstParagraph(note.content, 120);
-    const updated = formatRelativeDate(note.updatedAt);
-    const tagsHtml = note.tags.slice(0, 3).map(tag => 
-      `<span class="badge badge--neutral">${ICONS_EXTRA.tag} ${escapeHtml(tag)}</span>`
-    ).join(' ');
-    
-    return `
-      <article class="card note-card" data-note-id="${note.id}" style="cursor: pointer; padding: var(--space-md);">
-        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-sm); margin-bottom: var(--space-xs);">
-          <h3 class="card__title" style="font-size: var(--font-size-base); font-weight: 600; margin: 0; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-            ${escapeHtml(note.title)}
-            ${note.isPinned ? `<span class="badge badge--primary" style="font-size: var(--font-size-xs); margin-left: var(--space-xs);">${ICONS_EXTRA.pin} Fijada</span>` : ''}
-          </h3>
-        </div>
-        ${tagsHtml ? `<div style="display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-bottom: var(--space-sm); font-size: var(--font-size-xs);">${tagsHtml}</div>` : ''}
-        <p style="font-size: var(--font-size-sm); color: var(--color-fg-muted); line-height: var(--line-height-relaxed); margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
-          ${escapeHtml(preview) || '<em style="color: var(--color-fg-subtle);">(vacía)</em>'}
-        </p>
-        <div style="margin-top: var(--space-sm); font-size: var(--font-size-xs); color: var(--color-fg-subtle);">${updated}</div>
-      </article>
-    `;
+    const card = NoteCard({
+      note,
+      onSelect: (id) => window.location.hash = `notes/${id}`,
+      onPin: (id) => this.db.notes.togglePin(id),
+      onEdit: (note) => window.location.hash = `notes/${note.id}`,
+      onDelete: (id) => this.db.notes.remove(id),
+      onDuplicate: (id) => this.db.notes.duplicate(id)
+    });
+    return card.outerHTML;
   }
   
   renderEmptyNotes() {
