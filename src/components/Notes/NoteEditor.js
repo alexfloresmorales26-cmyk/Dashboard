@@ -1,6 +1,7 @@
 /**
  * NoteEditor - Editor Markdown con preview split-view en tiempo real
  * Toolbar, atajos teclado, auto-guardado, sanitizado XSS
+ * GLASSMORPHISM EDITION
  */
 
 import { renderMarkdownSync } from '../../utils/markdown.js';
@@ -36,7 +37,7 @@ const ICONS = {
 export function NoteEditor({ note, onSave, onClose, onDelete, onDuplicate }) {
   const isNew = !note.id;
   const editor = document.createElement('div');
-  editor.className = 'note-editor modal';
+  editor.className = 'note-editor modal glass';
   editor.style.maxWidth = '900px';
   
   let saveTimeout = null;
@@ -70,7 +71,7 @@ export function NoteEditor({ note, onSave, onClose, onDelete, onDuplicate }) {
     <form id="note-form">
       <div class="modal__body" style="display: flex; flex-direction: column; flex: 1; min-height: 0; padding: 0;">
         <!-- Título y Tags -->
-        <div style="padding: var(--space-md) var(--space-lg); border-bottom: 1px solid var(--color-border); flex-shrink: 0;">
+        <div style="padding: var(--space-md) var(--space-lg); border-bottom: 1px solid var(--glass-border); flex-shrink: 0; background: var(--glass-bg-subtle); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);">
           <div style="display: flex; gap: var(--space-md); align-items: flex-start;">
             <input type="text" class="form-input" id="note-title" name="title" 
                    placeholder="Título de la nota..." 
@@ -87,27 +88,27 @@ export function NoteEditor({ note, onSave, onClose, onDelete, onDuplicate }) {
         </div>
         
         <!-- Toolbar -->
-        <div class="editor__toolbar" style="display: flex; flex-wrap: wrap; gap: var(--space-xs); padding: var(--space-sm) var(--space-md); border-bottom: 1px solid var(--color-border); background: var(--color-bg); flex-shrink: 0;">
+        <div class="editor__toolbar" style="display: flex; flex-wrap: wrap; gap: var(--space-xs); padding: var(--space-sm) var(--space-md); border-bottom: 1px solid var(--glass-border); background: var(--glass-bg-subtle); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); flex-shrink: 0;">
           <div style="display: flex; gap: 2px;" role="group" aria-label="Formato texto">
             <button type="button" class="btn btn--ghost btn--icon btn--sm" data-md-bold title="Negrita (Ctrl+B)" aria-label="Negrita">${ICONS.bold}</button>
             <button type="button" class="btn btn--ghost btn--icon btn--sm" data-md-italic title="Cursiva (Ctrl+I)" aria-label="Cursiva">${ICONS.italic}</button>
             <button type="button" class="btn btn--ghost btn--icon btn--sm" data-md-strikethrough title="Tachado" aria-label="Tachado">${ICONS.strikethrough}</button>
             <button type="button" class="btn btn--ghost btn--icon btn--sm" data-md-code title="Código inline" aria-label="Código">${ICONS.code}</button>
           </div>
-          <div style="width: 1px; background: var(--color-border); margin: 0 var(--space-xs);"></div>
+          <div style="width: 1px; background: var(--glass-border); margin: 0 var(--space-xs);"></div>
           <div style="display: flex; gap: 2px;" role="group" aria-label="Bloques">
             <button type="button" class="btn btn--ghost btn--icon btn--sm" data-md-h1 title="Encabezado 1" aria-label="H1">${ICONS.h1}</button>
             <button type="button" class="btn btn--ghost btn--icon btn--sm" data-md-h2 title="Encabezado 2" aria-label="H2">${ICONS.h2}</button>
             <button type="button" class="btn btn--ghost btn--icon btn--sm" data-md-codeblock title="Bloque código" aria-label="Bloque código">${ICONS.codeblock}</button>
             <button type="button" class="btn btn--ghost btn--icon btn--sm" data-md-quote title="Cita" aria-label="Cita">${ICONS.quote}</button>
           </div>
-          <div style="width: 1px; background: var(--color-border); margin: 0 var(--space-xs);"></div>
+          <div style="width: 1px; background: var(--glass-border); margin: 0 var(--space-xs);"></div>
           <div style="display: flex; gap: 2px;" role="group" aria-label="Listas">
             <button type="button" class="btn btn--ghost btn--icon btn--sm" data-md-list title="Lista" aria-label="Lista">${ICONS.list}</button>
             <button type="button" class="btn btn--ghost btn--icon btn--sm" data-md-ol title="Lista numerada" aria-label="Lista numerada">${ICONS.ol}</button>
             <button type="button" class="btn btn--ghost btn--icon btn--sm" data-md-hr title="Línea horizontal" aria-label="Separador">${ICONS.hr}</button>
           </div>
-          <div style="width: 1px; background: var(--color-border); margin: 0 var(--space-xs);"></div>
+          <div style="width: 1px; background: var(--glass-border); margin: 0 var(--space-xs);"></div>
           <div style="display: flex; gap: 2px;" role="group" aria-label="Media">
             <button type="button" class="btn btn--ghost btn--icon btn--sm" data-md-link title="Enlace (Ctrl+K)" aria-label="Enlace">${ICONS.link}</button>
             <button type="button" class="btn btn--ghost btn--icon btn--sm" data-md-image title="Imagen" aria-label="Imagen">${ICONS.image}</button>
@@ -118,41 +119,41 @@ export function NoteEditor({ note, onSave, onClose, onDelete, onDuplicate }) {
             <button type="button" class="btn btn--ghost btn--icon btn--sm" data-undo title="Deshacer (Ctrl+Z)" aria-label="Deshacer">${ICONS.undo}</button>
             <button type="button" class="btn btn--ghost btn--icon btn--sm" data-redo title="Rehacer (Ctrl+Y)" aria-label="Rehacer">${ICONS.redo}</button>
           </div>
-          <div style="width: 1px; background: var(--color-border); margin: 0 var(--space-xs);"></div>
+          <div style="width: 1px; background: var(--glass-border); margin: 0 var(--space-xs);"></div>
           <div style="display: flex; align-items: center; gap: var(--space-sm);">
             <button type="button" class="btn btn--ghost btn--icon btn--sm" data-toggle-preview title="Alternar preview" aria-label="Alternar preview" style="padding: var(--space-xs);">${ICONS.preview}</button>
-            <span class="editor__status" id="save-status" style="font-size: var(--font-size-xs); color: var(--color-fg-muted); min-width: 80px; text-align: right;">Guardado</span>
+            <span class="editor__status" id="save-status" style="font-size: var(--font-size-xs); color: var(--glass-fg-muted); min-width: 80px; text-align: right;">Guardado</span>
           </div>
         </div>
         
         <!-- Split View: Editor + Preview -->
-        <div class="editor__split" style="flex: 1; display: flex; min-height: 0; overflow: hidden;">
+        <div class="split-view" style="flex: 1; display: flex; min-height: 0; overflow: hidden; border-radius: var(--radius-lg); border: 1px solid var(--glass-border);">
           <!-- Editor Panel -->
-          <div class="editor__pane editor__pane--edit" style="flex: 1; display: flex; flex-direction: column; border-right: 1px solid var(--color-border); min-width: 0;">
+          <div class="split-view__pane split-view__pane--edit" style="flex: 1; display: flex; flex-direction: column; border-right: 1px solid var(--glass-border); min-width: 0; background: var(--glass-bg);">
             <textarea class="editor__textarea" 
                       id="note-content" 
                       name="content"
-                      style="flex: 1; padding: var(--space-md); resize: none; font-family: var(--font-mono); font-size: var(--font-size-sm); line-height: var(--line-height-relaxed); background: var(--color-bg); color: var(--color-fg); border: none; outline: none;"
+                      style="flex: 1; padding: var(--space-md); resize: none; font-family: var(--font-mono); font-size: var(--font-size-sm); line-height: var(--line-height-relaxed); background: transparent; color: var(--glass-fg); border: none; outline: none;"
                       placeholder="Escribe en Markdown...${!isNew ? '' : ' (Ctrl+S para guardar)'}"
                       spellcheck="false">${escapeHtml(initialContent)}</textarea>
           </div>
           
           <!-- Resizer -->
-          <div class="split-view__resizer" id="resizer" style="width: 4px; background: var(--color-border); cursor: col-resize; flex-shrink: 0; display: ${showPreview ? 'block' : 'none'};"></div>
+          <div class="split-view__resizer" id="resizer" style="width: 4px; background: var(--glass-border); cursor: col-resize; flex-shrink: 0; display: ${showPreview ? 'block' : 'none'};"></div>
           
           <!-- Preview Panel -->
-          <div class="editor__pane editor__pane--preview" id="preview-pane" style="flex: 1; padding: var(--space-md); overflow: auto; min-width: 0; background: var(--color-bg-elevated); display: ${showPreview ? 'flex' : 'none'}; flex-direction: column;">
-            <div class="editor__preview-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-md); padding-bottom: var(--space-sm); border-bottom: 1px solid var(--color-border); flex-shrink: 0;">
-              <h3 style="font-size: var(--font-size-sm); font-weight: 600; color: var(--color-fg-muted); margin: 0;">Vista previa</h3>
+          <div class="split-view__pane split-view__pane--preview" id="preview-pane" style="flex: 1; padding: var(--space-md); overflow: auto; min-width: 0; background: var(--glass-bg-subtle); display: ${showPreview ? 'flex' : 'none'}; flex-direction: column;">
+            <div class="editor__preview-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-md); padding-bottom: var(--space-sm); border-bottom: 1px solid var(--glass-border); flex-shrink: 0;">
+              <h3 style="font-size: var(--font-size-sm); font-weight: 600; color: var(--glass-fg-muted); margin: 0;">Vista previa</h3>
             </div>
-            <div class="editor__preview" id="preview" style="flex: 1; min-height: 200px; line-height: var(--line-height-relaxed);">
+            <div class="editor__preview" id="preview" style="flex: 1; min-height: 200px; color: var(--glass-fg); line-height: var(--line-height-relaxed);">
               ${renderMarkdownSync(initialContent)}
             </div>
           </div>
         </div>
       </div>
       
-      <footer class="modal__footer" style="display: flex; justify-content: flex-end; gap: var(--space-sm); padding: var(--space-md) var(--space-lg); border-top: 1px solid var(--color-border); flex-shrink: 0;">
+      <footer class="modal__footer" style="display: flex; justify-content: flex-end; gap: var(--space-sm); padding: var(--space-md) var(--space-lg); border-top: 1px solid var(--glass-border); flex-shrink: 0; background: var(--glass-bg-subtle); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);">
         <button type="button" class="btn btn--ghost btn--sm" data-duplicate>${ICONS.duplicate} Duplicar</button>
         <button type="button" class="btn btn--danger btn--sm" data-delete>${ICONS.delete} Eliminar</button>
         <button type="button" class="btn btn--secondary btn--sm" data-close>Cancelar</button>
@@ -310,14 +311,14 @@ export function NoteEditor({ note, onSave, onClose, onDelete, onDuplicate }) {
   
   document.addEventListener('mousemove', (e) => {
     if (!isResizing) return;
-    const container = editor.querySelector('.editor__split');
+    const container = editor.querySelector('.split-view');
     const rect = container.getBoundingClientRect();
     const leftWidth = e.clientX - rect.left;
     const totalWidth = rect.width;
     const leftPercent = (leftWidth / totalWidth) * 100;
     
     if (leftPercent > 20 && leftPercent < 80) {
-      const panes = container.querySelectorAll('.editor__pane');
+      const panes = container.querySelectorAll('.split-view__pane');
       panes[0].style.flex = `0 0 ${leftPercent}%`;
       panes[1].style.flex = `0 0 ${100 - leftPercent}%`;
     }
@@ -326,7 +327,7 @@ export function NoteEditor({ note, onSave, onClose, onDelete, onDuplicate }) {
   document.addEventListener('mouseup', () => {
     if (isResizing) {
       isResizing = false;
-      const panes = editor.querySelectorAll('.editor__pane');
+      const panes = editor.querySelectorAll('.split-view__pane');
       panes.forEach(p => p.style.flex = '1');
     }
   });

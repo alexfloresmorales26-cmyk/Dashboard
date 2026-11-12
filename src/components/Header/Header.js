@@ -1,5 +1,6 @@
 /**
  * Header Component - Título, tema, fecha, stats, navegación, barra progreso
+ * GLASSMORPHISM EDITION
  */
 
 import { nanoid } from '../../utils/id.js';
@@ -262,51 +263,51 @@ export function Header({ db, onNavigate }) {
         </header>
         <div class="modal__body" style="padding: var(--space-lg);">
           <div style="display: grid; grid-template-columns: auto 1fr; gap: var(--space-md) var(--space-lg); font-size: var(--font-size-sm);">
-            <kbd style="background: var(--color-bg); border: 1px solid var(--color-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">D</kbd>
+            <kbd style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">D</kbd>
             <span>Ir al Dashboard</span>
             
-            <kbd style="background: var(--color-bg); border: 1px solid var(--color-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">1</kbd>
+            <kbd style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">1</kbd>
             <span>Ver Tareas</span>
             
-            <kbd style="background: var(--color-bg); border: 1px solid var(--color-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">2</kbd>
+            <kbd style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">2</kbd>
             <span>Ver Notas</span>
             
-            <kbd style="background: var(--color-bg); border: 1px solid var(--color-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">3</kbd>
+            <kbd style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">3</kbd>
             <span>Ver Metas</span>
             
-            <kbd style="background: var(--color-bg); border: 1px solid var(--color-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">T</kbd>
+            <kbd style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">T</kbd>
             <span>Alternar tema claro/oscuro</span>
             
-            <kbd style="background: var(--color-bg); border: 1px solid var(--color-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">A</kbd>
+            <kbd style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">A</kbd>
             <span>Nueva tarea (en vista tareas)</span>
             
-            <kbd style="background: var(--color-bg); border: 1px solid var(--color-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">N</kbd>
+            <kbd style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">N</kbd>
             <span>Nueva nota (en vista notas)</span>
             
-            <kbd style="background: var(--color-bg); border: 1px solid var(--color-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">G</kbd>
+            <kbd style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">G</kbd>
             <span>Nueva meta (en vista metas)</span>
             
-            <kbd style="background: var(--color-bg); border: 1px solid var(--color-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">?</kbd>
+            <kbd style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">?</kbd>
             <span>Mostrar esta ayuda</span>
             
-            <hr style="grid-column: 1 / -1; margin: var(--space-md) 0; border-color: var(--color-border);">
+            <hr style="grid-column: 1 / -1; margin: var(--space-md) 0; border-color: var(--glass-border);">
             
-            <span style="font-weight: 600; color: var(--color-fg-muted);">En editor de notas:</span>
+            <span style="font-weight: 600; color: var(--glass-fg-muted);">En editor de notas:</span>
             <span></span>
             
-            <kbd style="background: var(--color-bg); border: 1px solid var(--color-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">Ctrl/Cmd + B</kbd>
+            <kbd style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">Ctrl/Cmd + B</kbd>
             <span>Negrita</span>
             
-            <kbd style="background: var(--color-bg); border: 1px solid var(--color-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">Ctrl/Cmd + I</kbd>
+            <kbd style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">Ctrl/Cmd + I</kbd>
             <span>Cursiva</span>
             
-            <kbd style="background: var(--color-bg); border: 1px solid var(--color-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">Ctrl/Cmd + K</kbd>
+            <kbd style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">Ctrl/Cmd + K</kbd>
             <span>Insertar enlace</span>
             
-            <kbd style="background: var(--color-bg); border: 1px solid var(--color-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">Ctrl/Cmd + S</kbd>
+            <kbd style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">Ctrl/Cmd + S</kbd>
             <span>Guardar nota</span>
             
-            <kbd style="background: var(--color-bg); border: 1px solid var(--color-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">Escape</kbd>
+            <kbd style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">Escape</kbd>
             <span>Cerrar modales</span>
           </div>
         </div>
