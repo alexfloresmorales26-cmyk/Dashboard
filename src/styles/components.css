@@ -730,3 +730,132 @@
   opacity: 1;
   visibility: visible;
 }
+
+/* ============================================
+   PROGRESS BAR (Header)
+   ============================================ */
+
+.progress-bar {
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--color-border);
+  z-index: calc(var(--z-dropdown) - 1);
+  overflow: visible;
+}
+
+.progress-bar__fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-success));
+  border-radius: 0 0 var(--radius-full) var(--radius-full);
+  transition: width 0.5s ease-out, background 0.3s ease;
+  position: relative;
+}
+
+.progress-bar__fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,0.3),
+    transparent
+  );
+  animation: progress-shine 2s infinite;
+}
+
+@keyframes progress-shine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.progress-bar__tooltip {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 8px;
+  padding: var(--space-md);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  min-width: 240px;
+  max-width: 300px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity var(--transition-normal), visibility var(--transition-normal), transform var(--transition-normal);
+  z-index: var(--z-tooltip);
+}
+
+.progress-bar:hover .progress-bar__tooltip,
+.progress-bar:focus-within .progress-bar__tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.progress-tooltip__header {
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  color: var(--color-fg);
+  margin-bottom: var(--space-sm);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.progress-tooltip__breakdown {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.progress-tooltip__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-xs);
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+}
+
+.progress-tooltip__label {
+  font-size: var(--font-size-xs);
+  color: var(--color-fg-muted);
+  text-transform: capitalize;
+}
+
+.progress-tooltip__value {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.progress-tooltip__detail {
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--color-border);
+}
+
+.progress-tooltip__detail small {
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-xs);
+}
+
+/* Ajuste para header height con progress bar */
+@media (max-width: 767px) {
+  :root {
+    --header-height: 56px;
+  }
+  .progress-bar {
+    top: var(--header-height);
+  }
+}

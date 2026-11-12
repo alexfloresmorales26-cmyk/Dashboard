@@ -1,5 +1,5 @@
 /**
- * Header Component - Título, tema, fecha, stats, navegación
+ * Header Component - Título, tema, fecha, stats, navegación, barra progreso
  */
 
 import { nanoid } from '../../utils/id.js';
@@ -27,6 +27,9 @@ export function Header({ db, onNavigate }) {
   header.className = 'header';
   header.id = 'header';
   header.role = 'banner';
+  
+  // Barra de progreso (se inserta después del header)
+  let progressBar = null;
   
   // Estado local para fecha
   let currentDate = new Date();
@@ -75,6 +78,104 @@ export function Header({ db, onNavigate }) {
       btn.innerHTML = theme === 'light' ? ICONS.moon : ICONS.sun;
       btn.setAttribute('aria-label', theme === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro');
       btn.title = theme === 'light' ? 'Modo oscuro (T)' : 'Modo claro (T)';
+    }
+  }
+  
+  function calculateProgress() {
+    const tasksStats = db.tasks.getStats();
+    const goalsStats = db.goals.getStats();
+    const notesStats = db.notes.getStats();
+    
+    // Progreso tareas: completadas / total (si hay tareas)
+    const tasksProgress = tasksStats.total > 0 
+      ? (tasksStats.completed / tasksStats.total) * 100 
+      : 0;
+    
+    // Progreso metas: completadas hoy / diarias (si hay metas diarias)
+    const goalsProgress = goalsStats.daily > 0 
+      ? (goalsStats.completedToday / goalsStats.daily) * 100 
+      : 0;
+    
+    // Actividad notas: normalizado (max 10 notas = 100%)
+    const notesProgress = Math.min((notesStats.total / 10) * 100, 100);
+    
+    // Ponderado: 40% tareas + 40% metas + 20% notas
+    const totalProgress = Math.round(
+      tasksProgress * 0.4 + goalsProgress * 0.4 + notesProgress * 0.2
+    );
+    
+    return {
+      total: Math.min(Math.max(totalProgress, 0), 100),
+      tasks: Math.round(tasksProgress),
+      goals: Math.round(goalsProgress),
+      notes: Math.round(notesProgress),
+      tasksCompleted: tasksStats.completed,
+      tasksTotal: tasksStats.total,
+      goalsCompleted: goalsStats.completedToday,
+      goalsTotal: goalsStats.daily,
+      notesTotal: notesStats.total
+    };
+  }
+  
+  function createProgressBar() {
+    if (progressBar) progressBar.remove();
+    
+    progressBar = document.createElement('div');
+    progressBar.className = 'progress-bar';
+    progressBar.setAttribute('role', 'progressbar');
+    progressBar.setAttribute('aria-valuemin', '0');
+    progressBar.setAttribute('aria-valuemax', '100');
+    progressBar.innerHTML = `
+      <div class="progress-bar__fill" style="width: 0%;"></div>
+      <div class="progress-bar__tooltip">
+        <div class="progress-tooltip__header">Progreso global</div>
+        <div class="progress-tooltip__breakdown">
+          <div class="progress-tooltip__item">
+            <span class="progress-tooltip__label">Tareas</span>
+            <span class="progress-tooltip__value" data-tooltip-tasks>0%</span>
+          </div>
+          <div class="progress-tooltip__item">
+            <span class="progress-tooltip__label">Metas hoy</span>
+            <span class="progress-tooltip__value" data-tooltip-goals>0%</span>
+          </div>
+          <div class="progress-tooltip__item">
+            <span class="progress-tooltip__label">Notas</span>
+            <span class="progress-tooltip__value" data-tooltip-notes>0%</span>
+          </div>
+        </div>
+        <div class="progress-tooltip__detail">
+          <small data-tooltip-detail></small>
+        </div>
+      </div>
+    `;
+    
+    // Insertar después del header
+    header.parentNode?.insertBefore(progressBar, header.nextSibling);
+    
+    // Animar entrada
+    requestAnimationFrame(() => updateProgressBar());
+  }
+  
+  function updateProgressBar() {
+    if (!progressBar) return;
+    
+    const progress = calculateProgress();
+    
+    const fill = progressBar.querySelector('.progress-bar__fill');
+    const tooltipTasks = progressBar.querySelector('[data-tooltip-tasks]');
+    const tooltipGoals = progressBar.querySelector('[data-tooltip-goals]');
+    const tooltipNotes = progressBar.querySelector('[data-tooltip-notes]');
+    const tooltipDetail = progressBar.querySelector('[data-tooltip-detail]');
+    
+    if (fill) {
+      fill.style.width = `${progress.total}%`;
+      progressBar.setAttribute('aria-valuenow', progress.total);
+    }
+    if (tooltipTasks) tooltipTasks.textContent = `${progress.tasks}%`;
+    if (tooltipGoals) tooltipGoals.textContent = `${progress.goals}%`;
+    if (tooltipNotes) tooltipNotes.textContent = `${progress.notes}%`;
+    if (tooltipDetail) {
+      tooltipDetail.textContent = `${progress.tasksCompleted}/${progress.tasksTotal} tareas · ${progress.goalsCompleted}/${progress.goalsTotal} metas · ${progress.notesTotal} notas`;
     }
   }
   
@@ -139,6 +240,13 @@ export function Header({ db, onNavigate }) {
     });
     
     renderStats();
+    
+    // Crear barra de progreso después del primer render
+    if (!progressBar) {
+      setTimeout(createProgressBar, 0);
+    } else {
+      updateProgressBar();
+    }
   }
   
   function showShortcutsModal() {
@@ -248,9 +356,18 @@ export function Header({ db, onNavigate }) {
   document.addEventListener('keydown', handleKeydown);
   
   // Suscribirse a cambios
-  const unsubTasks = db.tasks.subscribe(renderStats);
-  const unsubNotes = db.notes.subscribe(renderStats);
-  const unsubGoals = db.goals.subscribe(renderStats);
+  const unsubTasks = db.tasks.subscribe(() => {
+    renderStats();
+    updateProgressBar();
+  });
+  const unsubNotes = db.notes.subscribe(() => {
+    renderStats();
+    updateProgressBar();
+  });
+  const unsubGoals = db.goals.subscribe(() => {
+    renderStats();
+    updateProgressBar();
+  });
   const unsubTheme = db.subscribe('theme', renderThemeToggle);
   
   // Cleanup
@@ -261,6 +378,7 @@ export function Header({ db, onNavigate }) {
     unsubNotes();
     unsubGoals();
     unsubTheme();
+    progressBar?.remove();
   };
   
   // Render inicial
