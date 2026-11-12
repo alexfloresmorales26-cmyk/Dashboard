@@ -10,6 +10,7 @@ import { nanoid } from '../utils/id.js';
 import { ICONS } from '../components/Header/Header.js';
 import { TaskList } from '../components/TaskList/TaskList.js';
 import { NoteCard } from '../components/Notes/NoteCard.js';
+import { GoalCard } from '../components/Goals/GoalCard.js';
 
 const ICONS_EXTRA = {
   plus: '<svg class="icon icon--md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
@@ -127,7 +128,7 @@ export class DashboardView {
   }
   
   // ============================================
-  // WIDGET METAS
+  // WIDGET METAS - Usa GoalCard compact
   // ============================================
   
   renderGoalsWidget() {
@@ -137,8 +138,8 @@ export class DashboardView {
     const goals = this.db.goals.getToday();
     
     container.innerHTML = `
-      <div class="goals-widget" style="display: flex; flex-direction: column; gap: var(--space-md);">
-        ${goals.length === 0 ? this.renderEmptyGoals() : goals.slice(0, 4).map(goal => this.renderGoalCard(goal)).join('')}
+      <div class="goals-widget" style="display: flex; flex-direction: column; gap: var(--space-sm);">
+        ${goals.length === 0 ? this.renderEmptyGoals() : goals.slice(0, 4).map(goal => this.renderGoalCardCompact(goal)).join('')}
         ${goals.length > 4 ? `
           <button class="btn btn--ghost btn--sm btn--block" data-nav="goals">
             Ver ${goals.length - 4} metas más →
@@ -152,68 +153,27 @@ export class DashboardView {
     });
     
     // Botones de incremento
-    container.querySelectorAll('[data-increment-goal]').forEach(btn => {
+    container.querySelectorAll('[data-increment]').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const id = btn.dataset.incrementGoal;
-        this.db.goals.incrementProgress(id);
+        const id = btn.closest('[data-goal-id]')?.dataset.goalId;
+        if (id) this.db.goals.incrementProgress(id);
       });
     });
   }
   
-  renderGoalCard(goal) {
-    const progress = goal.progress;
-    const isCompleted = goal.isCompleted;
-    const radius = 32;
-    const circumference = 2 * Math.PI * radius;
-    const offset = circumference - (progress / 100) * circumference;
-    
-    return `
-      <article class="card goal-card" style="padding: var(--space-md);">
-        <div style="display: flex; align-items: center; gap: var(--space-md);">
-          <div class="goal-ring" style="position: relative; width: 64px; height: 64px; flex-shrink: 0;">
-            <svg width="64" height="64" class="progress-ring">
-              <circle class="progress-ring__bg" cx="32" cy="32" r="${radius}" />
-              <circle 
-                class="progress-ring__progress ${isCompleted ? 'progress-ring__progress--success' : ''}" 
-                cx="32" cy="32" r="${radius}"
-                stroke-dasharray="${circumference}"
-                stroke-dashoffset="${offset}"
-                style="transition: stroke-dashoffset 0.5s ease-out;"
-              />
-            </svg>
-            <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: var(--font-size-sm); color: var(--color-fg);">
-              ${progress}%
-            </div>
-          </div>
-          
-          <div style="flex: 1; min-width: 0;">
-            <h3 class="card__title" style="margin-bottom: var(--space-xs); ${isCompleted ? 'text-decoration: line-through; color: var(--color-fg-muted);' : ''}">
-              ${escapeHtml(goal.title)}
-            </h3>
-            <div style="font-size: var(--font-size-sm); color: var(--color-fg-muted); display: flex; align-items: center; gap: var(--space-sm);">
-              <span>${goal.current}/${goal.target} ${goal.unit}</span>
-              ${goal.streak > 0 ? `
-                <span class="badge badge--warning" style="font-size: var(--font-size-xs); display: flex; align-items: center; gap: 4px;">
-                  🔥 ${goal.streak} días
-                </span>
-              ` : ''}
-            </div>
-          </div>
-          
-          <button 
-            class="btn btn--primary btn--icon btn--lg" 
-            data-increment-goal="${goal.id}"
-            ${isCompleted ? 'disabled' : ''}
-            aria-label="${isCompleted ? 'Meta completada' : `Incrementar ${goal.title}`}"
-            title="${isCompleted ? '¡Completada!' : 'Incrementar'}"
-            style="flex-shrink: 0;"
-          >
-            ${isCompleted ? ICONS_EXTRA.checkCircle : ICONS_EXTRA.plus}
-          </button>
-        </div>
-      </article>
-    `;
+  renderGoalCardCompact(goal) {
+    const card = GoalCard({
+      goal,
+      onIncrement: (id) => this.db.goals.incrementProgress(id),
+      onDecrement: () => {}, // No decrement en compact
+      onEdit: () => window.location.hash = 'goals',
+      onReset: () => {},
+      onDelete: () => {},
+      onViewHistory: () => {},
+      compact: true
+    });
+    return card.outerHTML;
   }
   
   renderEmptyGoals() {
