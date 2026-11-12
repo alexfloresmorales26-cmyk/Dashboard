@@ -2,7 +2,8 @@
  * NoteCard - Tarjeta de nota para lista (preview, tags, pinned)
  */
 
-import { getFirstParagraph, formatRelativeDate } from '../../utils/date.js';
+import { formatRelativeDate } from '../../utils/date.js';
+import { getFirstParagraph } from '../../utils/markdown.js';
 import { ICONS } from '../Header/Header.js';
 
 const ICONS_EXTRA = {
