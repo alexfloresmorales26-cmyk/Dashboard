@@ -1,5 +1,6 @@
 /* ============================================
    LAYOUT PRINCIPAL - DASHBOARD GRID - GLASSMORPHISM
+   FIXED: Explicit text colors
    ============================================ */
 
 .app {
@@ -9,6 +10,7 @@
   max-width: var(--max-content-width);
   margin: 0 auto;
   background: transparent;
+  color: var(--text-primary);
 }
 
 /* ============================================
@@ -31,6 +33,7 @@
   gap: var(--space-md);
   flex-shrink: 0;
   box-shadow: var(--shadow-glass);
+  color: var(--text-primary);
 }
 
 .header__brand {
@@ -39,7 +42,7 @@
   gap: var(--space-sm);
   font-weight: 700;
   font-size: var(--font-size-xl);
-  color: var(--glass-fg);
+  color: var(--text-primary);
   white-space: nowrap;
   text-decoration: none;
 }
@@ -49,7 +52,7 @@
   height: 32px;
   color: var(--color-primary);
   flex-shrink: 0;
-  filter: drop-shadow(0 2px 4px rgba(59, 130, 246, 0.3));
+  filter: drop-shadow(0 2px 4px rgba(59, 130, 246, 0.35));
 }
 
 .header__center {
@@ -63,7 +66,7 @@
 
 .header__date {
   font-size: var(--font-size-sm);
-  color: var(--glass-fg-muted);
+  color: var(--text-muted);
   font-weight: 500;
   white-space: nowrap;
   padding: var(--space-xs) var(--space-sm);
@@ -79,7 +82,7 @@
   align-items: center;
   gap: var(--space-md);
   font-size: var(--font-size-xs);
-  color: var(--glass-fg-subtle);
+  color: var(--text-subtle);
 }
 
 .header__stat {
@@ -93,10 +96,11 @@
   border-radius: var(--radius-full);
   font-weight: 600;
   border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
 }
 
 .header__stat-value {
-  color: var(--glass-fg);
+  color: var(--text-primary);
 }
 
 .header__actions {
@@ -127,7 +131,7 @@
   border-radius: 0 0 var(--radius-full) var(--radius-full);
   transition: width 0.5s ease-out, background 0.3s ease;
   position: relative;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
 }
 
 .progress-bar__fill::after {
@@ -140,7 +144,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255,255,255,0.4),
+    rgba(255,255,255,0.5),
     transparent
   );
   animation: progress-shine 2s infinite;
@@ -171,6 +175,7 @@
   pointer-events: none;
   transition: opacity var(--transition-normal), visibility var(--transition-normal), transform var(--transition-normal);
   z-index: var(--z-tooltip);
+  color: var(--text-primary);
 }
 
 .progress-bar:hover .progress-bar__tooltip,
@@ -183,7 +188,7 @@
 .progress-tooltip__header {
   font-weight: 600;
   font-size: var(--font-size-sm);
-  color: var(--glass-fg);
+  color: var(--text-primary);
   margin-bottom: var(--space-sm);
   padding-bottom: var(--space-sm);
   border-bottom: 1px solid var(--glass-border);
@@ -211,7 +216,7 @@
 
 .progress-tooltip__label {
   font-size: var(--font-size-xs);
-  color: var(--glass-fg-muted);
+  color: var(--text-muted);
   text-transform: capitalize;
 }
 
@@ -227,7 +232,7 @@
 }
 
 .progress-tooltip__detail small {
-  color: var(--glass-fg-muted);
+  color: var(--text-muted);
   font-size: var(--font-size-xs);
 }
 
@@ -242,6 +247,7 @@
   padding: var(--space-lg);
   overflow: hidden;
   background: transparent;
+  color: var(--text-primary);
 }
 
 /* Columna de tareas */
@@ -284,6 +290,7 @@
   height: 100%;
   overflow: hidden;
   transition: all var(--transition-normal) !important;
+  color: var(--text-primary) !important;
 }
 
 .widget:hover {
@@ -302,12 +309,13 @@
   background: var(--glass-bg-subtle);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
+  color: var(--text-primary);
 }
 
 .widget__title {
   font-size: var(--font-size-lg);
   font-weight: 600;
-  color: var(--glass-fg);
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   gap: var(--space-sm);
@@ -317,7 +325,7 @@
   width: 20px;
   height: 20px;
   color: var(--color-primary);
-  filter: drop-shadow(0 2px 4px rgba(59, 130, 246, 0.3));
+  filter: drop-shadow(0 2px 4px rgba(59, 130, 246, 0.35));
 }
 
 .widget__actions {
@@ -331,6 +339,7 @@
   overflow: auto;
   padding: var(--space-md);
   min-height: 0;
+  color: var(--text-secondary);
 }
 
 .widget__footer {
@@ -340,6 +349,7 @@
   background: var(--glass-bg-subtle);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
+  color: var(--text-secondary);
 }
 
 /* ============================================
@@ -459,7 +469,8 @@
   border-top: 1px solid var(--glass-border-strong) !important;
   display: flex;
   z-index: var(--z-dropdown);
-  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.12);
+  color: var(--text-primary);
 }
 
 .tab {
@@ -470,16 +481,17 @@
   justify-content: center;
   gap: var(--space-xs);
   padding: var(--space-sm) var(--space-md);
-  color: var(--glass-fg-muted);
+  color: var(--text-muted);
   font-size: var(--font-size-xs);
   font-weight: 500;
   transition: all var(--transition-fast);
   border: none;
   background: transparent;
+  cursor: pointer;
 }
 
 .tab:hover {
-  color: var(--glass-fg);
+  color: var(--text-primary);
   background: var(--glass-bg-subtle);
 }
 
@@ -536,3 +548,60 @@
   background: var(--color-primary-light);
   color: var(--color-primary);
 }
+
+/* ============================================
+   GLOBAL TEXT COLOR ENFORCEMENT
+   ============================================ */
+
+:root {
+  /* Ensure all text inherits proper colors */
+  color-scheme: light dark;
+}
+
+html {
+  color: var(--text-primary);
+  background-color: var(--color-bg);
+}
+
+body {
+  color: var(--text-primary);
+  background-color: var(--color-bg);
+}
+
+* {
+  color: inherit;
+}
+
+/* Force text colors on common elements */
+h1, h2, h3, h4, h5, h6 { color: var(--text-primary); }
+p, span, li, td, th, dt, dd { color: var(--text-secondary); }
+strong, b, dt { color: var(--text-primary); }
+small, caption { color: var(--text-muted); }
+code, kbd, samp, pre { color: var(--text-secondary); }
+mark { background: var(--color-warning-light); color: var(--text-primary); }
+a { color: var(--text-link); text-decoration: none; }
+a:hover { color: var(--text-link-hover); text-decoration: underline; }
+a:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; border-radius: var(--radius-sm); }
+
+label { color: var(--text-secondary); font-weight: 500; }
+input, textarea, select, button { color: inherit; font-family: inherit; }
+input::placeholder, textarea::placeholder { color: var(--text-subtle); }
+input:focus, textarea:focus, select:focus { color: var(--text-primary); }
+
+/* Tables */
+table { color: var(--text-secondary); }
+th { color: var(--text-primary); font-weight: 600; }
+td { color: var(--text-secondary); }
+
+/* Lists */
+ul, ol { color: var(--text-secondary); }
+
+/* Forms */
+fieldset { color: var(--text-secondary); }
+legend { color: var(--text-primary); font-weight: 600; }
+
+/* Blockquote */
+blockquote { color: var(--text-muted); border-left-color: var(--glass-border); }
+
+/* HR */
+hr { border-color: var(--glass-border); }
