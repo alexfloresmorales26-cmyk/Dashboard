@@ -16,7 +16,7 @@ export function DashboardLayout({ }) {
   // Detectar móvil para tabs
   const isMobile = window.innerWidth < 768;
   
-  main.innerHTML = `
+  container.innerHTML = `
     <!-- Columna Tareas -->
     <section class="dashboard__tasks" aria-labelledby="tasks-heading">
       <div class="widget" data-widget="tasks">
