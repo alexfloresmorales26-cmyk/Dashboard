@@ -13,14 +13,21 @@
   <link rel="stylesheet" href="/src/styles/reset.css">
   <link rel="stylesheet" href="/src/styles/layout.css">
   <link rel="stylesheet" href="/src/styles/components.css">
+  <link rel="stylesheet" href="/src/styles/navigation.css">
 </head>
 <body>
-  <div id="app" class="app">
+  <div id="app" class="app app--with-sidebar">
+    <!-- Barra lateral fija (desktop) -->
+    <aside id="sidebar" class="nav-sidebar" role="navigation" aria-label="Navegación principal"></aside>
+    
     <!-- Header se inyecta aquí -->
     <header id="header" class="header"></header>
     
+    <!-- Breadcrumbs / ruta actual -->
+    <nav id="breadcrumbs" class="breadcrumbs" aria-label="Ruta actual"></nav>
+    
     <!-- Layout principal del dashboard -->
-    <main id="main" class="dashboard" role="main">
+    <main id="main" role="main">
       <!-- Se inyecta DashboardView -->
     </main>
   </div>

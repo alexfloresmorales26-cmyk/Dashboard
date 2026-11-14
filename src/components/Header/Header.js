@@ -149,9 +149,9 @@ export function Header({ db, onNavigate }) {
       
       <div class="header__actions">
         ${!isMobile ? `
-          <button class="btn btn--ghost btn--icon" data-nav="tasks" title="Ver tareas (1)" aria-label="Ver tareas">${ICONS.list}</button>
-          <button class="btn btn--ghost btn--icon" data-nav="notes" title="Ver notas (2)" aria-label="Ver notas">${ICONS.fileText}</button>
-          <button class="btn btn--ghost btn--icon" data-nav="goals" title="Ver metas (3)" aria-label="Ver metas">${ICONS.targetIcon}</button>
+          <button class="btn btn--ghost btn--icon header__nav-item" data-nav="tasks" title="Ver tareas (1)" aria-label="Ver tareas">${ICONS.list}</button>
+          <button class="btn btn--ghost btn--icon header__nav-item" data-nav="notes" title="Ver notas (2)" aria-label="Ver notas">${ICONS.fileText}</button>
+          <button class="btn btn--ghost btn--icon header__nav-item" data-nav="goals" title="Ver metas (3)" aria-label="Ver metas">${ICONS.targetIcon}</button>
         ` : ''}
         <button class="btn btn--ghost btn--icon" data-data-manager title="Gestión de datos (D)" aria-label="Gestión de datos (Exportar/Importar)">${ICONS.database}</button>
         <button class="btn btn--ghost btn--icon" data-theme-toggle aria-label="${theme === 'light' ? 'Modo oscuro' : 'Modo claro'}" title="${theme === 'light' ? 'Modo oscuro (T)' : 'Modo claro (T)'}">${theme === 'light' ? ICONS.moon : ICONS.sun}</button>

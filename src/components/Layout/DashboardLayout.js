@@ -7,11 +7,11 @@ import { db } from '../../store/index.js';
 import { ICONS } from '../Header/Header.js';
 
 export function DashboardLayout({ }) {
-  const main = document.createElement('main');
-  main.className = 'dashboard';
-  main.id = 'main';
-  main.role = 'main';
-  main.setAttribute('data-dashboard-layout', 'true');
+  const container = document.createElement('div');
+  container.className = 'dashboard';
+  container.id = 'dashboard-layout';
+  container.role = 'main';
+  container.setAttribute('data-dashboard-layout', 'true');
   
   // Detectar móvil para tabs
   const isMobile = window.innerWidth < 768;
@@ -107,12 +107,12 @@ export function DashboardLayout({ }) {
   
   // Mostrar tabs en móvil
   if (isMobile) {
-    const tabs = main.querySelector('.tabs');
+    const tabs = container.querySelector('.tabs');
     if (tabs) tabs.hidden = false;
   }
   
   // Event listeners para navegación
-  main.querySelectorAll('[data-nav]').forEach(el => {
+  container.querySelectorAll('[data-nav]').forEach(el => {
     el.addEventListener('click', () => {
       const route = el.dataset.nav;
       window.location.hash = route;
@@ -120,20 +120,20 @@ export function DashboardLayout({ }) {
   });
   
   // Event listeners para acciones
-  main.querySelector('[data-action="add-task"]')?.addEventListener('click', () => {
+  container.querySelector('[data-action="add-task"]')?.addEventListener('click', () => {
     window.dispatchEvent(new CustomEvent('app:add-task'));
   });
   
-  main.querySelector('[data-action="add-note"]')?.addEventListener('click', () => {
+  container.querySelector('[data-action="add-note"]')?.addEventListener('click', () => {
     window.dispatchEvent(new CustomEvent('app:add-note'));
   });
   
-  main.querySelector('[data-action="add-goal"]')?.addEventListener('click', () => {
+  container.querySelector('[data-action="add-goal"]')?.addEventListener('click', () => {
     window.dispatchEvent(new CustomEvent('app:add-goal'));
   });
   
   // Búsqueda notas
-  const searchInput = main.querySelector('[data-search-notes]');
+  const searchInput = container.querySelector('[data-search-notes]');
   if (searchInput) {
     let searchTimeout;
     searchInput.addEventListener('input', (e) => {
@@ -145,11 +145,11 @@ export function DashboardLayout({ }) {
   }
   
   // Cleanup
-  main.destroy = () => {
+  container.destroy = () => {
     // Los event listeners se limpian automáticamente al remover del DOM
   };
   
-  return main;
+  return container;
 }
 
 export default DashboardLayout;
