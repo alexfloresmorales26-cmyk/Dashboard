@@ -61,6 +61,67 @@ function getRouteParams() {
   return parts.slice(1);
 }
 
+// Navegación programática (definida temprano para evitar ReferenceError)
+export function goTo(route, params = []) {
+  const hash = params.length > 0 ? `${route}/${params.join('/')}` : route;
+  window.location.hash = hash;
+}
+
+async function navigate() {
+  const route = getRoute();
+  const params = getRouteParams();
+  const ViewClass = routes[route] || DashboardView;
+
+  // Renderizar sidebar y breadcrumbs (solo una vez al inicio, luego actualizar)
+  if (currentView === null) {
+    renderSidebar();
+    renderBreadcrumbs();
+  } else {
+    updateActiveIndicators(route);
+  }
+
+  // Limpiar vista anterior
+  if (currentViewInstance && typeof currentViewInstance.destroy === 'function') {
+    currentViewInstance.destroy();
+  }
+
+  // Renderizar nueva vista
+  const main = document.getElementById('main');
+  if (!main) return;
+
+  // Agregar clase de entrada para animación
+  main.classList.remove('view-fade-in');
+  void main.offsetWidth; // forzar reflow
+  main.classList.add('view-fade-in');
+
+  // Mostrar layout base si es dashboard, sino vista completa
+  if (route === 'dashboard' || route === '') {
+    main.innerHTML = '';
+    currentLayout = DashboardLayout({});
+    main.appendChild(currentLayout);
+
+    // Renderizar DashboardView (se conecta al layout existente)
+    currentViewInstance = new ViewClass({ db, onNavigate: goTo });
+    const viewElement = currentViewInstance.render();
+    main.appendChild(viewElement); // Se adjunta al main, pero DashboardView usa contenedores del layout
+  } else {
+    // Vistas expandidas (pantalla completa)
+    main.innerHTML = '';
+    currentViewInstance = new ViewClass({ db, onNavigate: goTo });
+    const viewElement = currentViewInstance.render();
+    main.appendChild(viewElement);
+  }
+
+  currentView = route;
+
+  // Actualizar indicadores activos después de renderizar
+  updateActiveIndicators(route);
+}
+
+function updateHeaderActive(route) {
+  // Mantenido por compatibilidad, ahora se maneja en updateActiveIndicators
+}
+
 function renderSidebar() {
   const sidebar = document.getElementById('sidebar');
   if (!sidebar) return;
@@ -156,61 +217,6 @@ function updateActiveIndicators(route) {
   renderBreadcrumbs();
 }
 
-async function navigate() {
-  const route = getRoute();
-  const params = getRouteParams();
-  const ViewClass = routes[route] || DashboardView;
-
-  // Renderizar sidebar y breadcrumbs (solo una vez al inicio, luego actualizar)
-  if (currentView === null) {
-    renderSidebar();
-    renderBreadcrumbs();
-  } else {
-    updateActiveIndicators(route);
-  }
-
-  // Limpiar vista anterior
-  if (currentViewInstance && typeof currentViewInstance.destroy === 'function') {
-    currentViewInstance.destroy();
-  }
-
-  // Renderizar nueva vista
-  const main = document.getElementById('main');
-  if (!main) return;
-
-  // Agregar clase de entrada para animación
-  main.classList.remove('view-fade-in');
-  void main.offsetWidth; // forzar reflow
-  main.classList.add('view-fade-in');
-
-  // Mostrar layout base si es dashboard, sino vista completa
-  if (route === 'dashboard' || route === '') {
-    main.innerHTML = '';
-    currentLayout = DashboardLayout({});
-    main.appendChild(currentLayout);
-
-    // Renderizar DashboardView (se conecta al layout existente)
-    currentViewInstance = new ViewClass({ db, onNavigate: goTo });
-    const viewElement = currentViewInstance.render();
-    main.appendChild(viewElement); // Se adjunta al main, pero DashboardView usa contenedores del layout
-  } else {
-    // Vistas expandidas (pantalla completa)
-    main.innerHTML = '';
-    currentViewInstance = new ViewClass({ db, onNavigate: goTo });
-    const viewElement = currentViewInstance.render();
-    main.appendChild(viewElement);
-  }
-
-  currentView = route;
-
-  // Actualizar indicadores activos después de renderizar
-  updateActiveIndicators(route);
-}
-
-function updateHeaderActive(route) {
-  // Mantenido por compatibilidad, ahora se maneja en updateActiveIndicators
-}
-
 // ============================================
 // EVENTOS GLOBALES PARA ACCIONES RÁPIDAS
 // ============================================
@@ -293,3 +299,6 @@ if (document.readyState === 'loading') {
 
 // Exponer para debugging
 window.__APP__ = { db, goTo, navigate };
+
+// Escuchar cambios de hash
+window.addEventListener('hashchange', navigate);
