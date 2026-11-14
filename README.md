@@ -1,7 +1,5 @@
 # Tablero Personal de Productividad
 
-![Dashboard Preview](docs/screenshot.png)
-
 Una aplicación web ligera (SPA) que integra **lista de tareas**, **notas en Markdown** y **rastreador de metas diarias** en un solo dashboard. Funciona 100% offline, sin backend, usando `localStorage` para persistencia.
 
 ## ✨ Características

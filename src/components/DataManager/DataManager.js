@@ -21,6 +21,10 @@ export function DataManager({ onClose }) {
   modal.className = 'modal-overlay';
   
   // State
+  let activeTab = 'export';
+  let importFile = null;
+  let importStatus = null;
+  let importMessage = '';
   
   function formatFileSize(bytes) {
     if (bytes < 1024) return `${bytes} B`;
@@ -29,12 +33,6 @@ export function DataManager({ onClose }) {
   }
   
   function render() {
-    const stats = {
-      tasks: db.tasks.getStats(),
-      notes: db.notes.getStats(),
-      goals: db.goals.getStats()
-    };
-    
     modal.innerHTML = `
       <div class="modal" style="max-width: 560px;">
         <header class="modal__header">
@@ -326,112 +324,7 @@ export function DataManager({ onClose }) {
       URL.revokeObjectURL(url);
       
       const btn = modal.querySelector('[data-action="export"]');
-      const original = btn.innerHTML;
-      btn.innerHTML = `✓ Descargado`;
-      btn.disabled = true;
-      setTimeout(() => {
-        btn.innerHTML = `${ICONS.download} Descargar JSON`;
-        btn.disabled = false;
-      }, 2000);
-    } catch (e) {
-      console.error('[DataManager] Export error:', e);
-      alert('Error al exportar: ' + e.message);
-    }
-  }
-  
-  function handleImport(file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const json = e.target.result;
-        const success = db.importData(json);
-        
-        if (success) {
-          importStatus = 'success';
-          importMessage = 'Datos importados correctamente';
-        } else {
-          importStatus = 'error';
-          importMessage = 'Formato JSON inválido o datos corruptos';
-        }
-        render();
-      } catch (err) {
-        importStatus = 'error';
-        importMessage = 'Error al leer archivo: ' + err.message;
-        render();
-      }
-    };
-    reader.readAsText(file);
-  }
-  
-  function handleClear() {
-    if (confirm('¿ESTÁS SEGURO? Se eliminarán TODOS los datos permanentemente.')) {
-      db.clearAll();
-      onClose?.();
-      const event = new CustomEvent('app:toast', { 
-        detail: { type: 'success', message: 'Todos los datos eliminados' } 
-      });
-      window.dispatchEvent(event);
-    }
-  }
-  
-  
-  function formatFileSize(bytes) {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  }
-  
-  function handleFileSelect(file) {
-    if (!file.name.endsWith('.json')) {
-      importStatus = 'error';
-      importMessage = 'El archivo debe ser .json';
-      render();
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      importStatus = 'error';
-      importMessage = 'Archivo muy grande (máx. 5 MB)';
-      render();
-      return;
-    }
-    importFile = file;
-    importStatus = null;
-    render();
-  }
-  
-  function handleExport(options) {
-    try {
-      const data = JSON.parse(db.exportData());
-      
-      if (!options.includeCompleted) {
-        data.tasks = data.tasks.filter(t => !t.completed);
-      }
-      if (!options.includePinned) {
-        data.notes = data.notes.filter(n => !n.isPinned);
-      }
-      if (!options.includeHistory) {
-        data.goals = data.goals.map(g => ({
-          ...g,
-          completedDates: [],
-          streak: 0,
-          lastCompleted: null
-        }));
-      }
-      
-      const json = JSON.stringify(data, null, 2);
-      const blob = new Blob([json], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `productividad-backup-${new Date().toISOString().split('T')[0]}.json`;
-      a.click();
-      
-      URL.revokeObjectURL(url);
-      
-      const btn = modal.querySelector('[data-action="export"]');
-      const original = btn.innerHTML;
-      btn.innerHTML = `✓ Descargado`;
+      btn.innerHTML = '✓ Descargado';
       btn.disabled = true;
       setTimeout(() => {
         btn.innerHTML = `${ICONS.download} Descargar JSON`;

@@ -304,12 +304,8 @@ export function NoteEditor({ note, onSave, onClose, onDelete, onDuplicate }) {
   
   // Resizer drag
   let isResizing = false;
-  resizer.addEventListener('mousedown', (e) => {
-    isResizing = true;
-    e.preventDefault();
-  });
   
-  document.addEventListener('mousemove', (e) => {
+  const handleMouseMove = (e) => {
     if (!isResizing) return;
     const container = editor.querySelector('.split-view');
     const rect = container.getBoundingClientRect();
@@ -322,15 +318,23 @@ export function NoteEditor({ note, onSave, onClose, onDelete, onDuplicate }) {
       panes[0].style.flex = `0 0 ${leftPercent}%`;
       panes[1].style.flex = `0 0 ${100 - leftPercent}%`;
     }
-  });
+  };
   
-  document.addEventListener('mouseup', () => {
+  const handleMouseUp = () => {
     if (isResizing) {
       isResizing = false;
       const panes = editor.querySelectorAll('.split-view__pane');
       panes.forEach(p => p.style.flex = '1');
     }
+  };
+  
+  resizer.addEventListener('mousedown', (e) => {
+    isResizing = true;
+    e.preventDefault();
   });
+  
+  document.addEventListener('mousemove', handleMouseMove);
+  document.addEventListener('mouseup', handleMouseUp);
   
   // Fullscreen
   editor.querySelector('[data-fullscreen]')?.addEventListener('click', () => {
