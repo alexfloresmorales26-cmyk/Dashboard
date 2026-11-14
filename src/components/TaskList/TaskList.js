@@ -64,7 +64,7 @@ export function TaskList({
       </div>
       
       <ul class="list task-list__list" role="list" data-task-list style="${compact ? 'max-height: 400px; overflow: auto;' : ''}">
-        ${tasks.length === 0 ? renderEmptyState() : tasks.map(task => renderTaskItem(task)).join('')}
+        ${tasks.length === 0 ? renderEmptyState() : ''}
       </ul>
       
       ${maxItems && db.tasks.filter(filters).length > maxItems ? `
@@ -74,11 +74,18 @@ export function TaskList({
       ` : ''}
     `;
     
+    // Añadir las tareas como elementos reales (no HTML strings) para conservar
+    // los listeners de checkbox/editar/eliminar
+    const listEl = container.querySelector('[data-task-list]');
+    tasks.forEach(task => listEl?.appendChild(renderTaskItem(task)));
+    
     bindEvents();
   }
   
   function renderTaskItem(task) {
-    const item = TaskItem({
+    // Devuelve el ELEMENTO (no outerHTML) para conservar los event listeners
+    // del checkbox, editar y eliminar.
+    return TaskItem({
       task,
       onToggle: (id) => db.tasks.toggleComplete(id),
       onEdit: (task) => openModal(task),
@@ -97,7 +104,6 @@ export function TaskList({
       },
       onDrop: (draggedId, targetId) => handleReorder(draggedId, targetId)
     });
-    return item.outerHTML;
   }
   
   function renderEmptyState() {
@@ -227,12 +233,13 @@ export function TaskList({
       task,
       onClose: () => {
         overlay.remove();
-        document.body.removeChild(overlay);
       },
       onSubmit: (idOrData, data) => {
         if (task) {
-          db.tasks.update(task.id, { ...idOrData, ...data });
+          // TaskForm pasa (task.id, data) al editar; no spread del id (string)
+          db.tasks.update(task.id, data);
         } else {
+          // TaskForm pasa (data) al crear
           db.tasks.create(idOrData);
         }
         overlay.remove();
@@ -244,7 +251,10 @@ export function TaskList({
     
     // Cerrar al click fuera
     overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) form.destroy?.(), overlay.remove();
+      if (e.target === overlay) {
+        form.destroy?.();
+        overlay.remove();
+      }
     });
   }
   

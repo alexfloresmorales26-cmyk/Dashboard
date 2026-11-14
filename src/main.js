@@ -62,6 +62,8 @@ export function goTo(route, params = []) {
 async function navigate() {
   const route = getRoute();
   const ViewClass = routes[route] || DashboardView;
+  // Parámetro opcional de la ruta (p. ej. notes/<id> para abrir una nota concreta)
+  const param = window.location.hash.split('/')[1] || null;
 
   // Renderizar sidebar y breadcrumbs (solo una vez al inicio, luego actualizar)
   if (currentView === null) {
@@ -87,7 +89,7 @@ async function navigate() {
   main.classList.add('view-fade-in');
 
   main.innerHTML = '';
-  currentViewInstance = new ViewClass({ db, onNavigate: goTo });
+  currentViewInstance = new ViewClass({ db, onNavigate: goTo, param });
   const viewElement = currentViewInstance.render();
   main.appendChild(viewElement);
 

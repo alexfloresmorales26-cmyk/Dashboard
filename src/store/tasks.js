@@ -53,16 +53,17 @@ export function tasksStore(parentStore) {
     const index = tasks.findIndex(t => t.id === id);
     if (index === -1) return null;
     
+    // No permitir que changes cambie id ni createdAt (se conservan los originales)
+    const safeChanges = { ...changes };
+    delete safeChanges.id;
+    delete safeChanges.createdAt;
+
     const updated = {
       ...tasks[index],
-      ...changes,
+      ...safeChanges,
       updatedAt: nowISO()
     };
-    
-    // No permitir cambiar id, createdAt
-    delete updated.id;
-    delete updated.createdAt;
-    
+
     const newTasks = [...tasks];
     newTasks[index] = updated;
     setAll(newTasks);

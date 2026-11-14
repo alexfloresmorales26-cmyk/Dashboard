@@ -136,7 +136,8 @@ export function createStore(initialData = {}) {
     subscribe,
     // Helpers comunes para arrays
     push: (key, item) => update(key, arr => [...(arr || []), item]),
-    remove: (key, predicate) => update(key, arr => (arr || []).filter(predicate)),
+    // Elimina los elementos que CUMPLEN el predicado (p. ej. remove('goals', g => g.id === id))
+    remove: (key, predicate) => update(key, arr => (arr || []).filter(x => !predicate(x))),
     find: (key, predicate) => (get(key) || []).find(predicate),
     findIndex: (key, predicate) => (get(key) || []).findIndex(predicate),
     sort: (key, compareFn) => update(key, arr => [...(arr || [])].sort(compareFn)),

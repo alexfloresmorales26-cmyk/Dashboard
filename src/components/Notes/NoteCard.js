@@ -35,6 +35,7 @@ export function NoteCard({ note, onSelect, onPin, onEdit, onDelete, onDuplicate 
           ${note.isPinned ? `<span class="badge badge--primary" style="font-size: var(--font-size-xs); margin-left: var(--space-xs);">${ICONS_EXTRA.pin} Fijada</span>` : ''}
         </h3>
         <div style="display: flex; gap: 2px; flex-shrink: 0; opacity: 0; transition: opacity var(--transition-fast);" class="note-card__actions">
+          <button class="btn btn--ghost btn--icon btn--sm ${note.isPinned ? 'btn--primary' : ''}" data-pin title="${note.isPinned ? 'Quitar fijada' : 'Fijar nota'}" aria-label="${note.isPinned ? 'Quitar fijada' : 'Fijar nota'}">${ICONS_EXTRA.pin}</button>
           <button class="btn btn--ghost btn--icon btn--sm" data-edit title="Editar" aria-label="Editar">${ICONS_EXTRA.edit}</button>
           <button class="btn btn--ghost btn--icon btn--sm" data-duplicate title="Duplicar" aria-label="Duplicar">${ICONS_EXTRA.duplicate}</button>
           <button class="btn btn--ghost btn--icon btn--sm btn--danger" data-delete title="Eliminar" aria-label="Eliminar">${ICONS_EXTRA.delete}</button>
@@ -61,8 +62,14 @@ export function NoteCard({ note, onSelect, onPin, onEdit, onDelete, onDuplicate 
   
   // Click principal -> seleccionar
   card.addEventListener('click', (e) => {
-    if (e.target.closest('[data-edit], [data-duplicate], [data-delete]')) return;
+    if (e.target.closest('[data-edit], [data-duplicate], [data-delete], [data-pin]')) return;
     onSelect?.(note.id);
+  });
+  
+  // Fijar / quitar fijada
+  card.querySelector('[data-pin]')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    onPin?.(note.id);
   });
   
   // Acciones
@@ -81,10 +88,12 @@ export function NoteCard({ note, onSelect, onPin, onEdit, onDelete, onDuplicate 
     if (confirm('¿Eliminar esta nota?')) onDelete?.(note.id);
   });
   
-  // Pin toggle (click en badge)
-  card.querySelector('.badge--primary')?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    onPin?.(note.id);
+  // Pin toggle (click en los badges "Fijada"; puede haber varios)
+  card.querySelectorAll('.badge--primary').forEach(badge => {
+    badge.addEventListener('click', (e) => {
+      e.stopPropagation();
+      onPin?.(note.id);
+    });
   });
   
   return card;

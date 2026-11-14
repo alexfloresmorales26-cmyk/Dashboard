@@ -39,15 +39,17 @@ export function notesStore(parentStore) {
     const index = notes.findIndex(n => n.id === id);
     if (index === -1) return null;
     
+    // No permitir que changes cambie id ni createdAt (se conservan los originales)
+    const safeChanges = { ...changes };
+    delete safeChanges.id;
+    delete safeChanges.createdAt;
+
     const updated = {
       ...notes[index],
-      ...changes,
+      ...safeChanges,
       updatedAt: nowISO()
     };
-    
-    delete updated.id;
-    delete updated.createdAt;
-    
+
     const newNotes = [...notes];
     newNotes[index] = updated;
     setAll(newNotes);

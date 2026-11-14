@@ -59,6 +59,11 @@ export class GoalsView {
     return this.element;
   }
   
+  // Expuesto para main.js: evento global 'app:add-goal' (botón del dashboard, tecla G)
+  openGoalModal() {
+    this.tracker?.openModal?.();
+  }
+  
   destroy() {
     this.tracker?.destroy?.();
     this.element = null;

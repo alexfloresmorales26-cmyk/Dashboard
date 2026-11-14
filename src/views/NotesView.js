@@ -16,12 +16,14 @@ const ICONS_EXTRA = {
 };
 
 export class NotesView {
-  constructor({ db: store, onNavigate }) {
+  constructor({ db: store, onNavigate, param }) {
     this.db = store;
     this.onNavigate = onNavigate;
     this.searchQuery = '';
-    this.selectedNoteId = null;
+    // Permite abrir directamente una nota vía la ruta notes/<id>
+    this.selectedNoteId = param || null;
     this.showPinnedOnly = false;
+    this.showAllTags = false;
     this.activeTag = null;
     this.unsubscribers = [];
     this.element = null;
@@ -33,6 +35,10 @@ export class NotesView {
     this.element.className = 'view notes-view';
     this.element.innerHTML = this.renderTemplate();
     
+    // Llenar la lista de notas con elementos reales (conserva listeners)
+    const listContainer = this.element.querySelector('[data-notes-list]');
+    if (listContainer) this.appendNotesList(listContainer, this.getFilteredNotes());
+    
     this.bindEvents();
     this.subscribeToChanges();
     
@@ -42,7 +48,6 @@ export class NotesView {
   renderTemplate() {
     const stats = this.db.notes.getStats();
     const allTags = this.db.notes.getAllTags();
-    const notes = this.getFilteredNotes();
     const selectedNote = this.selectedNoteId ? this.db.notes.getById(this.selectedNoteId) : null;
     
     return `
@@ -67,27 +72,14 @@ export class NotesView {
         
         <!-- Filtros rápidos -->
         <div class="toolbar__filters" style="display: flex; flex-wrap: wrap; gap: var(--space-sm); align-items: center;">
-          <button class="btn btn--ghost btn--sm ${this.showPinnedOnly ? 'btn--primary' : ''}" data-filter-pinned>
-            ${ICONS.pin || '📌'} Fijadas
-          </button>
-          ${allTags.slice(0, 5).map(tag => `
-            <button class="btn btn--ghost btn--sm ${this.activeTag === tag ? 'btn--primary' : ''}" data-filter-tag="${tag}">
-              ${ICONS_EXTRA.tag || '#'} ${tag}
-            </button>
-          `).join('')}
-          ${allTags.length > 5 ? `
-            <button class="btn btn--ghost btn--sm" data-all-tags>+${allTags.length - 5} más</button>
-          ` : ''}
-          <button class="btn btn--ghost btn--sm" data-clear-filters>Limpiar</button>
+          ${this.renderFiltersHtml(allTags)}
         </div>
       </div>
       
       <div class="view__content" style="display: flex; flex: 1; overflow: hidden; min-height: 0;">
         <!-- Panel lista (sidebar) -->
         <aside class="notes-sidebar" style="width: 350px; max-width: 40%; min-width: 280px; border-right: 1px solid var(--color-border); display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0;">
-          <div class="notes-list" style="flex: 1; overflow: auto; padding: var(--space-sm);" data-notes-list>
-            ${notes.length === 0 ? this.renderEmptyNotes() : this.renderNotesList(notes)}
-          </div>
+          <div class="notes-list" style="flex: 1; overflow: auto; padding: var(--space-sm);" data-notes-list></div>
         </aside>
         
         <!-- Panel editor/preview -->
@@ -117,17 +109,21 @@ export class NotesView {
   }
   
   renderNotesList(notes) {
-    return notes.map(note => {
-      const card = NoteCard({
-        note,
-        onSelect: (id) => this.selectNote(id),
-        onPin: (id) => this.db.notes.togglePin(id),
-        onEdit: (note) => this.openEditor(note),
-        onDelete: (id) => this.db.notes.remove(id),
-        onDuplicate: (id) => this.db.notes.duplicate(id)
-      });
-      return card.outerHTML;
-    }).join('');
+    // Devuelve los ELEMENTOS NoteCard (no HTML strings) para conservar los
+    // listeners de seleccionar/editar/duplicar/eliminar/pin
+    return notes.map(note => NoteCard({
+      note,
+      onSelect: (id) => this.selectNote(id),
+      onPin: (id) => this.db.notes.togglePin(id),
+      onEdit: (note) => this.openEditor(note),
+      onDelete: (id) => this.db.notes.remove(id),
+      onDuplicate: (id) => this.db.notes.duplicate(id)
+    }));
+  }
+  
+  appendNotesList(container, notes) {
+    container.innerHTML = notes.length === 0 ? this.renderEmptyNotes() : '';
+    this.renderNotesList(notes).forEach(card => container.appendChild(card));
   }
   
   renderEmptyNotes() {
@@ -204,7 +200,8 @@ export class NotesView {
     });
     
     this.element.querySelector('[data-all-tags]')?.addEventListener('click', () => {
-      // TODO: Modal con todos los tags
+      this.showAllTags = !this.showAllTags;
+      this.refreshToolbar();
     });
     
     // Renderizar editor si hay nota seleccionada
@@ -213,22 +210,31 @@ export class NotesView {
     }
   }
   
+  renderFiltersHtml(allTags) {
+    const visibleTags = this.showAllTags ? allTags : allTags.slice(0, 5);
+    const hiddenCount = allTags.length - 5;
+    return `
+      <button class="btn btn--ghost btn--sm ${this.showPinnedOnly ? 'btn--primary' : ''}" data-filter-pinned>
+        ${ICONS.pin || '📌'} Fijadas
+      </button>
+      ${visibleTags.map(tag => `
+        <button class="btn btn--ghost btn--sm ${this.activeTag === tag ? 'btn--primary' : ''}" data-filter-tag="${tag}">
+          ${ICONS_EXTRA.tag || '#'} ${tag}
+        </button>
+      `).join('')}
+      ${allTags.length > 5 ? `
+        <button class="btn btn--ghost btn--sm" data-all-tags>
+          ${this.showAllTags ? '− Menos' : `+${hiddenCount} más`}
+        </button>
+      ` : ''}
+      <button class="btn btn--ghost btn--sm" data-clear-filters>Limpiar</button>
+    `;
+  }
+  
   refreshToolbar() {
     const toolbar = this.element.querySelector('.toolbar__filters');
     if (toolbar) {
-      const allTags = this.db.notes.getAllTags();
-      toolbar.innerHTML = `
-        <button class="btn btn--ghost btn--sm ${this.showPinnedOnly ? 'btn--primary' : ''}" data-filter-pinned>
-          ${ICONS.pin || '📌'} Fijadas
-        </button>
-        ${allTags.slice(0, 5).map(tag => `
-          <button class="btn btn--ghost btn--sm ${this.activeTag === tag ? 'btn--primary' : ''}" data-filter-tag="${tag}">
-            ${ICONS_EXTRA.tag || '#'} ${tag}
-          </button>
-        `).join('')}
-        ${allTags.length > 5 ? `<button class="btn btn--ghost btn--sm" data-all-tags>+${allTags.length - 5} más</button>` : ''}
-        <button class="btn btn--ghost btn--sm" data-clear-filters>Limpiar</button>
-      `;
+      toolbar.innerHTML = this.renderFiltersHtml(this.db.notes.getAllTags());
       this.bindFilterEvents(toolbar);
     }
   }
@@ -256,38 +262,18 @@ export class NotesView {
       this.refreshToolbar();
       this.refreshList();
     });
+    container.querySelector('[data-all-tags]')?.addEventListener('click', () => {
+      this.showAllTags = !this.showAllTags;
+      this.refreshToolbar();
+    });
   }
   
   refreshList() {
     const listContainer = this.element.querySelector('[data-notes-list]');
     if (listContainer) {
       const notes = this.getFilteredNotes();
-      listContainer.innerHTML = notes.length === 0 ? this.renderEmptyNotes() : this.renderNotesList(notes);
-      // Re-bind events para nuevas tarjetas
-      listContainer.querySelectorAll('[data-note-id]').forEach(card => {
-        const id = card.dataset.noteId;
-        card.addEventListener('click', (e) => {
-          if (e.target.closest('[data-edit], [data-duplicate], [data-delete], .badge--primary')) return;
-          this.selectNote(id);
-        });
-        // Re-bind action buttons
-        card.querySelector('[data-edit]')?.addEventListener('click', (e) => {
-          e.stopPropagation();
-          this.openEditor(this.db.notes.getById(id));
-        });
-        card.querySelector('[data-duplicate]')?.addEventListener('click', (e) => {
-          e.stopPropagation();
-          this.db.notes.duplicate(id);
-        });
-        card.querySelector('[data-delete]')?.addEventListener('click', (e) => {
-          e.stopPropagation();
-          if (confirm('¿Eliminar esta nota?')) this.db.notes.remove(id);
-        });
-        card.querySelector('.badge--primary')?.addEventListener('click', (e) => {
-          e.stopPropagation();
-          this.db.notes.togglePin(id);
-        });
-      });
+      this.appendNotesList(listContainer, notes);
+      // Los listeners van dentro de cada NoteCard; no hace falta re-bind
     }
   }
   

@@ -44,15 +44,17 @@ export function goalsStore(parentStore) {
     const index = goals.findIndex(g => g.id === id);
     if (index === -1) return null;
     
+    // No permitir que changes cambie id ni createdAt (se conservan los originales)
+    const safeChanges = { ...changes };
+    delete safeChanges.id;
+    delete safeChanges.createdAt;
+
     const updated = {
       ...goals[index],
-      ...changes,
+      ...safeChanges,
       updatedAt: nowISO()
     };
-    
-    delete updated.id;
-    delete updated.createdAt;
-    
+
     const newGoals = [...goals];
     newGoals[index] = updated;
     setAll(newGoals);

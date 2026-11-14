@@ -53,8 +53,8 @@ export function GoalsTracker({ compact = false, maxItems = null, onNavigate }) {
         </div>
       </div>
       
-      <div class="goals-tracker__list" style="display: flex; flex-direction: column; gap: ${compact ? 'var(--space-sm)' : 'var(--space-md)'};">
-        ${filteredGoals.length === 0 ? renderEmptyState() : filteredGoals.map(goal => renderGoalCard(goal)).join('')}
+      <div class="goals-tracker__list" style="display: flex; flex-direction: column; gap: ${compact ? 'var(--space-sm)' : 'var(--space-md)'};" data-goals-list>
+        ${filteredGoals.length === 0 ? renderEmptyState() : ''}
       </div>
       
       ${maxItems && goals.length > maxItems ? `
@@ -66,11 +66,17 @@ export function GoalsTracker({ compact = false, maxItems = null, onNavigate }) {
       ${!compact && stats.total > 0 ? renderStatsSummary(stats) : ''}
     `;
     
+    // Añadir las tarjetas como elementos reales (conserva listeners)
+    const listEl = container.querySelector('[data-goals-list]');
+    filteredGoals.forEach(goal => listEl?.appendChild(renderGoalCard(goal)));
+    
     bindEvents();
   }
   
   function renderGoalCard(goal) {
-    const card = GoalCard({
+    // Devuelve el ELEMENTO (no outerHTML) para conservar los listeners de
+    // incrementar/decrementar/editar/resetear/eliminar/historial
+    return GoalCard({
       goal,
       onIncrement: (id) => db.goals.incrementProgress(id),
       onDecrement: (id) => db.goals.decrementProgress(id),
@@ -80,7 +86,6 @@ export function GoalsTracker({ compact = false, maxItems = null, onNavigate }) {
       onViewHistory: (id) => showHistoryModal(id),
       compact
     });
-    return card.outerHTML;
   }
   
   function renderEmptyState() {
@@ -138,13 +143,13 @@ export function GoalsTracker({ compact = false, maxItems = null, onNavigate }) {
       goal: editGoal,
       onClose: () => {
         overlay.remove();
-        document.body.removeChild(overlay);
       },
       onSubmit: (idOrData, data) => {
         if (editGoal) {
           db.goals.update(editGoal.id, data);
         } else {
-          db.goals.create(data);
+          // GoalForm llama onSubmit(data) al crear (un solo argumento)
+          db.goals.create(idOrData);
         }
         overlay.remove();
       }
@@ -154,7 +159,10 @@ export function GoalsTracker({ compact = false, maxItems = null, onNavigate }) {
     document.body.appendChild(overlay);
     
     overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) form.destroy?.(), overlay.remove();
+      if (e.target === overlay) {
+        form.destroy?.();
+        overlay.remove();
+      }
     });
   }
   
@@ -164,6 +172,18 @@ export function GoalsTracker({ compact = false, maxItems = null, onNavigate }) {
     
     const history = db.goals.getHistory(goalId, 30);
     const completedCount = history.filter(h => h.completed).length;
+    
+    // Mejor racha real a partir del historial (sin mutar el estado)
+    const sortedDates = [...(goal.completedDates || [])].sort();
+    let bestStreak = 0;
+    let run = 0;
+    let prevDate = null;
+    for (const d of sortedDates) {
+      const diff = prevDate ? Math.round((new Date(d) - new Date(prevDate)) / 86400000) : 0;
+      run = prevDate && diff === 1 ? run + 1 : 1;
+      bestStreak = Math.max(bestStreak, run);
+      prevDate = d;
+    }
     
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
@@ -187,19 +207,7 @@ export function GoalsTracker({ compact = false, maxItems = null, onNavigate }) {
                 <div style="font-size: var(--font-size-xs); color: var(--color-fg-muted);">Racha actual</div>
               </div>
               <div>
-                <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--color-warning);">${Math.max(...goal.completedDates.map(d => {
-    const dates = goal.completedDates.sort();
-    let maxStreak = 1, current = 1;
-    for (let i = 1; i < dates.length; i++) {
-      const prev = new Date(dates[i-1]);
-      const curr = new Date(dates[i]);
-      const diff = (curr - prev) / (1000*60*60*24);
-      if (diff === 1) current++;
-      else current = 1;
-      maxStreak = Math.max(maxStreak, current);
-    }
-    return maxStreak;
-  }), 0)}</div>
+                <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--color-warning);">${bestStreak}</div>
                 <div style="font-size: var(--font-size-xs); color: var(--color-fg-muted);">Mejor racha</div>
               </div>
             </div>
@@ -239,6 +247,9 @@ export function GoalsTracker({ compact = false, maxItems = null, onNavigate }) {
   container.destroy = () => {
     unsub();
   };
+  
+  // Exponer el modal para uso externo (GoalsView.openGoalModal, atajo G)
+  container.openModal = openModal;
   
   // Render inicial
   render();

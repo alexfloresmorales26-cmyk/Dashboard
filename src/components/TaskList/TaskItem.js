@@ -57,8 +57,9 @@ export function TaskItem({ task, onToggle, onEdit, onDelete, onDragStart, onDrag
   });
   
   // Checkbox toggle
-  item.querySelector('[data-toggle]')?.addEventListener('click', (e) => {
-    e.stopPropagation();
+  // Se escucha 'change' en el input (no 'click' en el label): el label reenvía
+  // la activación al input y el click burbujea, disparando el handler 2 veces.
+  item.querySelector('[data-toggle] input')?.addEventListener('change', () => {
     onToggle?.(task.id);
   });
   
