@@ -5,7 +5,6 @@
 
 import { db } from './store/index.js';
 import { Header } from './components/Header/Header.js';
-import { DashboardLayout } from './components/Layout/DashboardLayout.js';
 import { DashboardView } from './views/DashboardView.js';
 import { TasksView } from './views/TasksView.js';
 import { NotesView } from './views/NotesView.js';
@@ -48,17 +47,10 @@ const routes = {
 
 let currentView = null;
 let currentViewInstance = null;
-let currentLayout = null;
 
 function getRoute() {
   const hash = window.location.hash.slice(1) || '';
   return hash.split('/')[0] || 'dashboard';
-}
-
-function getRouteParams() {
-  const hash = window.location.hash.slice(1);
-  const parts = hash.split('/');
-  return parts.slice(1);
 }
 
 // Navegación programática (definida temprano para evitar ReferenceError)
@@ -69,7 +61,6 @@ export function goTo(route, params = []) {
 
 async function navigate() {
   const route = getRoute();
-  const params = getRouteParams();
   const ViewClass = routes[route] || DashboardView;
 
   // Renderizar sidebar y breadcrumbs (solo una vez al inicio, luego actualizar)
@@ -85,7 +76,8 @@ async function navigate() {
     currentViewInstance.destroy();
   }
 
-  // Renderizar nueva vista
+  // Renderizar nueva vista (el DashboardView es standalone: incluye sus
+  // propias tarjetas de estadísticas y grid de widgets)
   const main = document.getElementById('main');
   if (!main) return;
 
@@ -94,23 +86,10 @@ async function navigate() {
   void main.offsetWidth; // forzar reflow
   main.classList.add('view-fade-in');
 
-  // Mostrar layout base si es dashboard, sino vista completa
-  if (route === 'dashboard' || route === '') {
-    main.innerHTML = '';
-    currentLayout = DashboardLayout({});
-    main.appendChild(currentLayout);
-
-    // Renderizar DashboardView (se conecta al layout existente)
-    currentViewInstance = new ViewClass({ db, onNavigate: goTo });
-    const viewElement = currentViewInstance.render();
-    main.appendChild(viewElement); // Se adjunta al main, pero DashboardView usa contenedores del layout
-  } else {
-    // Vistas expandidas (pantalla completa)
-    main.innerHTML = '';
-    currentViewInstance = new ViewClass({ db, onNavigate: goTo });
-    const viewElement = currentViewInstance.render();
-    main.appendChild(viewElement);
-  }
+  main.innerHTML = '';
+  currentViewInstance = new ViewClass({ db, onNavigate: goTo });
+  const viewElement = currentViewInstance.render();
+  main.appendChild(viewElement);
 
   currentView = route;
 
@@ -204,10 +183,10 @@ function updateActiveIndicators(route) {
     });
   }
 
-  // Actualizar header nav items
+  // Actualizar header nav items (solo botones de navegación, no el brand)
   const header = document.getElementById('header');
   if (header) {
-    header.querySelectorAll('[data-nav]').forEach(el => {
+    header.querySelectorAll('.header__nav-item[data-nav]').forEach(el => {
       const isActive = el.dataset.nav === route;
       el.classList.toggle('header__nav-item--active', isActive);
     });
@@ -270,7 +249,9 @@ async function init() {
       db,
       onNavigate: goTo
     });
-    headerEl.appendChild(header);
+    // Header() crea su propio <header class="header">: se reemplaza el
+    // contenedor vacío de index.html para no anidar dos headers duplicados
+    headerEl.replaceWith(header);
   }
 
   // 2. Navegación inicial

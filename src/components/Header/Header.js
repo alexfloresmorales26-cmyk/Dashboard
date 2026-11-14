@@ -27,7 +27,7 @@ export function Header({ db, onNavigate }) {
   const header = document.createElement('header');
   header.className = 'header';
   header.id = 'header';
-  header.role = 'banner';
+  header.setAttribute('role', 'banner');
   
   let progressBar = null;
   let currentDate = new Date();

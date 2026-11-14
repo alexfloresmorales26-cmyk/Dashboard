@@ -19,7 +19,7 @@ const defaultState = {
   tasks: [],
   notes: [],
   goals: [],
-  theme: 'light',
+  theme: 'dark',
   view: 'dashboard',
   version: STORAGE_VERSION
 };
@@ -45,7 +45,7 @@ function loadFromStorage() {
       tasks: Array.isArray(parsed.tasks) ? parsed.tasks : [],
       notes: Array.isArray(parsed.notes) ? parsed.notes : [],
       goals: Array.isArray(parsed.goals) ? parsed.goals : [],
-      theme: parsed.theme || 'light',
+      theme: parsed.theme || 'dark',
       view: parsed.view || 'dashboard',
       version: STORAGE_VERSION
     };

@@ -119,17 +119,17 @@ export function DashboardLayout({ }) {
     });
   });
   
-  // Event listeners para acciones
-  container.querySelector('[data-action="add-task"]')?.addEventListener('click', () => {
-    window.dispatchEvent(new CustomEvent('app:add-task'));
+  // Event listeners para acciones (querySelectorAll: hay varios botones por acción)
+  container.querySelectorAll('[data-action="add-task"]').forEach(btn => {
+    btn.addEventListener('click', () => window.dispatchEvent(new CustomEvent('app:add-task')));
   });
-  
-  container.querySelector('[data-action="add-note"]')?.addEventListener('click', () => {
-    window.dispatchEvent(new CustomEvent('app:add-note'));
+
+  container.querySelectorAll('[data-action="add-note"]').forEach(btn => {
+    btn.addEventListener('click', () => window.dispatchEvent(new CustomEvent('app:add-note')));
   });
-  
-  container.querySelector('[data-action="add-goal"]')?.addEventListener('click', () => {
-    window.dispatchEvent(new CustomEvent('app:add-goal'));
+
+  container.querySelectorAll('[data-action="add-goal"]').forEach(btn => {
+    btn.addEventListener('click', () => window.dispatchEvent(new CustomEvent('app:add-goal')));
   });
   
   // Búsqueda notas

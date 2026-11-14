@@ -268,7 +268,11 @@
 /* ---- Ajustes para layout con sidebar fija ---- */
 .app--with-sidebar {
   grid-template-columns: var(--sidebar-width) 1fr;
-  grid-template-rows: var(--header-height) auto 1fr;
+  /* Altura definida: la fila 1fr llena el viewport y main hace scroll interno.
+     La fila del medio es min-content para que align-content:stretch no la
+     infle con el espacio sobrante (bug del hueco bajo el header). */
+  grid-template-rows: var(--header-height) min-content minmax(0, 1fr);
+  height: 100vh;
 }
 
 .app--with-sidebar .header {
@@ -294,7 +298,8 @@
 .app--with-sidebar main {
   grid-column: 2 / 3;
   grid-row: 3 / 4;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
 }
@@ -312,7 +317,7 @@
 
   .app--with-sidebar {
     grid-template-columns: 1fr;
-    grid-template-rows: var(--header-height) auto 1fr;
+    grid-template-rows: var(--header-height) min-content minmax(0, 1fr);
   }
 
   .app--with-sidebar .header {

@@ -41,7 +41,7 @@ export class DashboardView {
     this.element.className = 'dashboard-view';
     this.element.innerHTML = `
       <!-- Estadísticas principales -->
-      <div class="stats-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); margin-bottom: var(--space-lg);">
+      <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-card__value">${stats.tasks.total}</div>
           <div class="stat-card__label">Tareas totales</div>
@@ -65,7 +65,7 @@ export class DashboardView {
       </div>
 
       <!-- Grid de widgets -->
-      <div class="dashboard-grid" style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: var(--space-lg); min-height: 600px;">
+      <div class="dashboard-grid">
         <!-- Columna izquierda: Análisis y gráficos -->
         <div class="widget-column">
           <div class="widget">
@@ -113,7 +113,7 @@ export class DashboardView {
         </div>
 
         <!-- Columna derecha: Proyectos y sesión -->
-        <div class="widget-column" style="display: flex; flex-direction: column; gap: var(--space-lg);">
+        <div class="widget-column">
           <div class="widget" style="flex: 1;">
             <div class="widget__header">
               <h3 class="widget__title">Projects</h3>
@@ -178,7 +178,7 @@ export class DashboardView {
         </div>
 
         <!-- Columna del medio: Progreso y equipo -->
-        <div class="widget-column" style="display: flex; flex-direction: column; gap: var(--space-lg);">
+        <div class="widget-column">
           <div class="widget" style="flex: 1;">
             <div class="widget__header">
               <h3 class="widget__title">Team collaboration</h3>
