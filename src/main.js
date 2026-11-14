@@ -257,13 +257,38 @@ async function init() {
   // 2. Navegación inicial
   await navigate();
 
-  // 3. Registrar Service Worker si está disponible
+  // 3. Service Worker: solo en producción. En desarrollo el SW cachea los CSS
+  //    que Vite sirve como módulos JS (respuesta no parseable como text/css)
+  //    y congela versiones viejas de los assets, rompiendo estilos e iconos.
   if ('serviceWorker' in navigator) {
-    try {
-      await navigator.serviceWorker.register('/sw.js');
-      console.log('[App] Service Worker registrado');
-    } catch (e) {
-      console.warn('[App] SW registration failed:', e);
+    if (import.meta.env.DEV) {
+      try {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        for (const reg of regs) await reg.unregister();
+        if ('caches' in window) {
+          const keys = await caches.keys();
+          for (const key of keys) await caches.delete(key);
+        }
+        if (regs.length > 0) console.log('[App] SW de desarrollo desregistrado y cachés limpiadas');
+      } catch (e) {
+        console.warn('[App] Limpieza de SW falló:', e);
+      }
+    } else {
+      try {
+        await navigator.serviceWorker.register('/sw.js');
+        console.log('[App] Service Worker registrado');
+
+        // Cuando un SW nuevo toma el control (p. ej. tras subir la versión del
+        // cache), recargar una sola vez para servir los assets actualizados.
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (refreshing) return;
+          refreshing = true;
+          window.location.reload();
+        });
+      } catch (e) {
+        console.warn('[App] SW registration failed:', e);
+      }
     }
   }
 

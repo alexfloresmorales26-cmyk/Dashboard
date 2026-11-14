@@ -40,12 +40,21 @@ function loadFromStorage() {
       return defaultState;
     }
     
-    // Validar estructura básica
+    // Validar estructura básica.
+    // Migración única: versiones anteriores persistían theme='light', pero el
+    // diseño real de la app es el tema oscuro. Se restaura a oscuro una sola
+    // vez (themeMigrated evita forzarlo de nuevo si el usuario cambia a claro).
+    let theme = parsed.theme || 'dark';
+    const themeMigrated = Boolean(parsed.themeMigrated);
+    if (!themeMigrated) {
+      theme = 'dark';
+    }
     return {
       tasks: Array.isArray(parsed.tasks) ? parsed.tasks : [],
       notes: Array.isArray(parsed.notes) ? parsed.notes : [],
       goals: Array.isArray(parsed.goals) ? parsed.goals : [],
-      theme: parsed.theme || 'dark',
+      theme,
+      themeMigrated,
       view: parsed.view || 'dashboard',
       version: STORAGE_VERSION
     };
@@ -65,6 +74,7 @@ function saveToStorage(state) {
       notes: state.notes,
       goals: state.goals,
       theme: state.theme,
+      themeMigrated: true,
       view: state.view,
       version: STORAGE_VERSION
     };

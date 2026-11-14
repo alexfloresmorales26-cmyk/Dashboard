@@ -3,7 +3,7 @@
  * Estrategia: Cache estático en install, network-first para HTML, cache-first para assets
  */
 
-const CACHE_NAME = 'productivity-dashboard-v1';
+const CACHE_NAME = 'productivity-dashboard-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -14,12 +14,23 @@ const STATIC_ASSETS = [
   '/src/styles/reset.css',
   '/src/styles/layout.css',
   '/src/styles/components.css',
+  '/src/styles/navigation.css',
+  '/src/styles/theme-dark.css',
   '/src/store/index.js',
   '/src/store/tasks.js',
   '/src/store/notes.js',
   '/src/store/goals.js',
   '/src/components/Header/Header.js',
   '/src/components/Layout/DashboardLayout.js',
+  '/src/components/DataManager/DataManager.js',
+  '/src/components/Goals/GoalCard.js',
+  '/src/components/Goals/GoalForm.js',
+  '/src/components/Goals/GoalsTracker.js',
+  '/src/components/Notes/NoteCard.js',
+  '/src/components/Notes/NoteEditor.js',
+  '/src/components/TaskList/TaskForm.js',
+  '/src/components/TaskList/TaskItem.js',
+  '/src/components/TaskList/TaskList.js',
   '/src/views/DashboardView.js',
   '/src/views/TasksView.js',
   '/src/views/NotesView.js',
