@@ -4,41 +4,24 @@
  */
 
 const CACHE_NAME = 'productivity-dashboard-v2';
+// Archivos que existen en el build final (dist). Los assets de src/ se
+// empaquetan con hashes en /assets/, así que se cachean en runtime (fetch),
+// no aquí: precachearlos provocaría errores 404 en cada install.
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
   '/favicon.svg',
-  '/src/main.js',
-  '/src/styles/variables.css',
-  '/src/styles/reset.css',
-  '/src/styles/layout.css',
-  '/src/styles/components.css',
-  '/src/styles/navigation.css',
-  '/src/styles/theme-dark.css',
-  '/src/store/index.js',
-  '/src/store/tasks.js',
-  '/src/store/notes.js',
-  '/src/store/goals.js',
-  '/src/components/Header/Header.js',
-  '/src/components/Layout/DashboardLayout.js',
-  '/src/components/DataManager/DataManager.js',
-  '/src/components/Goals/GoalCard.js',
-  '/src/components/Goals/GoalForm.js',
-  '/src/components/Goals/GoalsTracker.js',
-  '/src/components/Notes/NoteCard.js',
-  '/src/components/Notes/NoteEditor.js',
-  '/src/components/TaskList/TaskForm.js',
-  '/src/components/TaskList/TaskItem.js',
-  '/src/components/TaskList/TaskList.js',
-  '/src/views/DashboardView.js',
-  '/src/views/TasksView.js',
-  '/src/views/NotesView.js',
-  '/src/views/GoalsView.js',
-  '/src/utils/reactive.js',
-  '/src/utils/id.js',
-  '/src/utils/date.js',
-  '/src/utils/markdown.js'
+  '/icons/icon-72.svg',
+  '/icons/icon-96.svg',
+  '/icons/icon-128.svg',
+  '/icons/icon-144.svg',
+  '/icons/icon-152.svg',
+  '/icons/icon-192.svg',
+  '/icons/icon-192.png',
+  '/icons/icon-384.svg',
+  '/icons/icon-512.svg',
+  '/icons/icon-512.png'
 ];
 
 // CDN assets que también cachear

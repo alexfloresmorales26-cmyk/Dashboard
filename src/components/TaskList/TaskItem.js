@@ -2,7 +2,7 @@
  * TaskItem - Componente individual de tarea con drag & drop, checkbox, prioridad
  */
 
-import { formatRelativeDate, todayString, isPast } from '../../utils/date.js';
+import { formatRelativeDate, todayString } from '../../utils/date.js';
 import { ICONS } from '../Header/Header.js';
 
 const ICONS_EXTRA = {
@@ -29,21 +29,21 @@ export function TaskItem({ task, onToggle, onEdit, onDelete, onDragStart, onDrag
       <span class="checkbox__box"></span>
     </label>
     <div class="task-item__content" style="flex: 1; min-width: 0;">
-      <div class="task-item__title" style="font-weight: 500; color: ${task.completed ? 'var(--color-fg-muted)' : 'var(--color-fg)'}; text-decoration: ${task.completed ? 'line-through' : 'none'};">
+      <div class="task-item__title" style="font-weight: 500; color: ${task.completed ? 'var(--ink-2)' : 'var(--ink)'}; text-decoration: ${task.completed ? 'line-through' : 'none'};">
         ${escapeHtml(task.title)}
       </div>
-      ${task.description ? `<div class="task-item__desc" style="font-size: var(--font-size-sm); color: var(--color-fg-muted); margin-top: var(--space-xs); line-height: var(--line-height-relaxed);">${escapeHtml(task.description)}</div>` : ''}
-      <div class="task-item__meta" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; font-size: var(--font-size-xs); color: var(--color-fg-muted);">
+      ${task.description ? `<div class="task-item__desc" style="font-size: var(--text-sm); color: var(--ink-2); margin-top: var(--s-1); line-height: var(--leading-snug);">${escapeHtml(task.description)}</div>` : ''}
+      <div class="task-item__meta" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; font-size: var(--text-xs); color: var(--ink-2);">
         ${dueText ? `<span class="${isOverdue ? 'text-danger' : ''}" title="${isOverdue ? 'Vencida' : ''}">${ICONS.calendar || '📅'} ${dueText}</span>` : ''}
         ${task.category ? `<span class="badge badge--neutral">${ICONS_EXTRA.tag} ${escapeHtml(task.category)}</span>` : ''}
         <span class="priority ${priorityClass}">${priorityLabels[task.priority]}</span>
       </div>
     </div>
-    <div class="task-item__actions" style="display: flex; gap: var(--space-xs); opacity: 0; transition: opacity var(--transition-fast);">
+    <div class="task-item__actions" style="display: flex; gap: var(--s-1); opacity: 0; transition: opacity var(--dur-fast);">
       <button class="btn btn--ghost btn--icon btn--sm" data-edit title="Editar" aria-label="Editar tarea">${ICONS_EXTRA.edit}</button>
       <button class="btn btn--ghost btn--icon btn--sm btn--danger" data-delete title="Eliminar" aria-label="Eliminar tarea">${ICONS_EXTRA.delete}</button>
     </div>
-    <div class="drag-handle" style="padding: var(--space-xs); color: var(--color-fg-subtle); cursor: grab;" aria-label="Arrastrar para reordenar">
+    <div class="drag-handle" style="padding: var(--s-1); color: var(--ink-3); cursor: grab;" aria-label="Arrastrar para reordenar">
       <svg class="icon icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="9" y1="4" x2="9" y2="20"/><line x1="15" y1="4" x2="15" y2="20"/></svg>
     </div>
   `;
@@ -83,7 +83,7 @@ export function TaskItem({ task, onToggle, onEdit, onDelete, onDragStart, onDrag
     onDragStart?.(task, item);
   });
   
-  item.addEventListener('dragend', (e) => {
+  item.addEventListener('dragend', () => {
     item.classList.remove('task-item--dragging');
     onDragEnd?.();
   });

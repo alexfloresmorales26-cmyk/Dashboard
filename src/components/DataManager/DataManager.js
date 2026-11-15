@@ -40,30 +40,30 @@ export function DataManager({ onClose }) {
           <button class="btn btn--ghost btn--icon modal__close" data-close aria-label="Cerrar">${ICONS.close}</button>
         </header>
         
-        <div class="modal__body" style="padding: var(--space-lg);">
-          <div class="data-stats" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); padding: var(--space-md); background: var(--glass-bg-subtle); border-radius: var(--radius-lg); border: 1px solid var(--glass-border);">
+        <div class="modal__body" style="padding: var(--s-6);">
+          <div class="data-stats" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-4); margin-bottom: var(--s-8); padding: var(--s-4); background: var(--surface-2); border-radius: var(--r-lg); border: 1px solid var(--line);">
             <div style="text-align: center;">
-              <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--color-primary);">${db.tasks.getStats().total}</div>
-              <div style="font-size: var(--font-size-xs); color: var(--text-muted);">Tareas (${db.tasks.getStats().completed} ✓)</div>
+              <div style="font-size: var(--text-lg); font-weight: 700; color: var(--accent);">${db.tasks.getStats().total}</div>
+              <div style="font-size: var(--text-xs); color: var(--ink-2);">Tareas (${db.tasks.getStats().completed} ✓)</div>
             </div>
             <div style="text-align: center;">
-              <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--color-success);">${db.notes.getStats().total}</div>
-              <div style="font-size: var(--font-size-xs); color: var(--text-muted);">Notas (${db.notes.getStats().pinned} 📌)</div>
+              <div style="font-size: var(--text-lg); font-weight: 700; color: var(--accent);">${db.notes.getStats().total}</div>
+              <div style="font-size: var(--text-xs); color: var(--ink-2);">Notas (${db.notes.getStats().pinned} 📌)</div>
             </div>
             <div style="text-align: center;">
-              <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--color-warning);">${db.goals.getStats().total}</div>
-              <div style="font-size: var(--font-size-xs); color: var(--text-muted);">Metas (${db.goals.getStats().daily} diarias)</div>
+              <div style="font-size: var(--text-lg); font-weight: 700; color: var(--ink-2);">${db.goals.getStats().total}</div>
+              <div style="font-size: var(--text-xs); color: var(--ink-2);">Metas (${db.goals.getStats().daily} diarias)</div>
             </div>
           </div>
           
-          <div class="data-tabs" style="display: flex; gap: var(--space-xs); margin-bottom: var(--space-lg); border-bottom: 1px solid var(--glass-border); padding-bottom: var(--space-sm);">
-            <button class="data-tab ${activeTab === 'export' ? 'active' : ''}" data-tab="export" style="flex: 1; padding: var(--space-sm) var(--space-md); background: transparent; border: none; color: ${activeTab === 'export' ? 'var(--color-primary)' : 'var(--text-muted)'}; font-weight: ${activeTab === 'export' ? '600' : '500'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: var(--space-xs); border-radius: var(--radius-md); transition: all var(--transition-fast);">
+          <div class="data-tabs" style="display: flex; gap: var(--s-1); margin-bottom: var(--s-6); border-bottom: 1px solid var(--line); padding-bottom: var(--s-2);">
+            <button class="data-tab ${activeTab === 'export' ? 'active' : ''}" data-tab="export" style="flex: 1; padding: var(--s-2) var(--s-4); background: transparent; border: none; color: ${activeTab === 'export' ? 'var(--accent)' : 'var(--ink-2)'}; font-weight: ${activeTab === 'export' ? '600' : '500'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: var(--s-1); border-radius: var(--r-md); transition: all var(--dur-fast);">
               ${ICONS.download} Exportar
             </button>
-            <button class="data-tab ${activeTab === 'import' ? 'active' : ''}" data-tab="import" style="flex: 1; padding: var(--space-sm) var(--space-md); background: transparent; border: none; color: ${activeTab === 'import' ? 'var(--color-primary)' : 'var(--text-muted)'}; font-weight: ${activeTab === 'import' ? '600' : '500'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: var(--space-xs); border-radius: var(--radius-md); transition: all var(--transition-fast);">
+            <button class="data-tab ${activeTab === 'import' ? 'active' : ''}" data-tab="import" style="flex: 1; padding: var(--s-2) var(--s-4); background: transparent; border: none; color: ${activeTab === 'import' ? 'var(--accent)' : 'var(--ink-2)'}; font-weight: ${activeTab === 'import' ? '600' : '500'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: var(--s-1); border-radius: var(--r-md); transition: all var(--dur-fast);">
               ${ICONS.upload} Importar
             </button>
-            <button class="data-tab ${activeTab === 'clear' ? 'active' : ''}" data-tab="clear" style="flex: 1; padding: var(--space-sm) var(--space-md); background: transparent; border: none; color: ${activeTab === 'clear' ? 'var(--color-danger)' : 'var(--text-muted)'}; font-weight: ${activeTab === 'clear' ? '600' : '500'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: var(--space-xs); border-radius: var(--radius-md); transition: all var(--transition-fast);">
+            <button class="data-tab ${activeTab === 'clear' ? 'active' : ''}" data-tab="clear" style="flex: 1; padding: var(--s-2) var(--s-4); background: transparent; border: none; color: ${activeTab === 'clear' ? 'var(--danger)' : 'var(--ink-2)'}; font-weight: ${activeTab === 'clear' ? '600' : '500'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: var(--s-1); border-radius: var(--r-md); transition: all var(--dur-fast);">
               ${ICONS.trash} Limpiar
             </button>
           </div>
@@ -96,30 +96,30 @@ export function DataManager({ onClose }) {
     if (activeTab !== 'export') return '';
     
     return `
-      <div class="data-panel" data-panel="export" style="animation: fadeIn var(--transition-fast);">
-        <div class="glass" style="padding: var(--space-lg); border-radius: var(--radius-lg);">
-          <h3 style="margin: 0 0 var(--space-sm); color: var(--text-primary);">Exportar Datos</h3>
-          <p style="margin: 0 0 var(--space-lg); color: var(--text-muted); font-size: var(--font-size-sm);">
+      <div class="data-panel" data-panel="export" style="animation: fadeIn var(--dur-fast);">
+        <div class="glass" style="padding: var(--s-6); border-radius: var(--r-lg);">
+          <h3 style="margin: 0 0 var(--s-2); color: var(--ink);">Exportar Datos</h3>
+          <p style="margin: 0 0 var(--s-6); color: var(--ink-2); font-size: var(--text-sm);">
             Descarga un archivo JSON con todas tus tareas, notas y metas. Incluye timestamp y versión.
           </p>
-          <div style="display: flex; flex-direction: column; gap: var(--space-sm);">
-            <label class="checkbox" style="font-size: var(--font-size-sm);">
+          <div style="display: flex; flex-direction: column; gap: var(--s-2);">
+            <label class="checkbox" style="font-size: var(--text-sm);">
               <input type="checkbox" class="checkbox__input" id="export-completed" checked>
               <span class="checkbox__box"></span>
               <span class="checkbox__label">Incluir tareas completadas</span>
             </label>
-            <label class="checkbox" style="font-size: var(--font-size-sm);">
+            <label class="checkbox" style="font-size: var(--text-sm);">
               <input type="checkbox" class="checkbox__input" id="export-pinned" checked>
               <span class="checkbox__box"></span>
               <span class="checkbox__label">Incluir notas fijadas</span>
             </label>
-            <label class="checkbox" style="font-size: var(--font-size-sm);">
+            <label class="checkbox" style="font-size: var(--text-sm);">
               <input type="checkbox" class="checkbox__input" id="export-goals-history" checked>
               <span class="checkbox__box"></span>
               <span class="checkbox__label">Incluir historial de metas</span>
             </label>
           </div>
-          <div style="margin-top: var(--space-lg); padding: var(--space-md); background: var(--glass-bg-subtle); border-radius: var(--radius-md); border: 1px solid var(--glass-border); font-size: var(--font-size-xs); color: var(--text-muted);">
+          <div style="margin-top: var(--s-6); padding: var(--s-4); background: var(--surface-2); border-radius: var(--r-md); border: 1px solid var(--line); font-size: var(--text-xs); color: var(--ink-2);">
             <strong>Formato:</strong> JSON con estructura { tasks, notes, goals, exportedAt, version }
           </div>
         </div>
@@ -131,41 +131,41 @@ export function DataManager({ onClose }) {
     if (activeTab !== 'import') return '';
     
     return `
-      <div class="data-panel" data-panel="import" style="animation: fadeIn var(--transition-fast);">
-        <div class="glass" style="padding: var(--space-lg); border-radius: var(--radius-lg);">
-          <h3 style="margin: 0 0 var(--space-sm); color: var(--text-primary);">Importar Datos</h3>
-          <p style="margin: 0 0 var(--space-lg); color: var(--text-muted); font-size: var(--font-size-sm);">
+      <div class="data-panel" data-panel="import" style="animation: fadeIn var(--dur-fast);">
+        <div class="glass" style="padding: var(--s-6); border-radius: var(--r-lg);">
+          <h3 style="margin: 0 0 var(--s-2); color: var(--ink);">Importar Datos</h3>
+          <p style="margin: 0 0 var(--s-6); color: var(--ink-2); font-size: var(--text-sm);">
             Selecciona un archivo JSON exportado previamente. <strong>Se fusionarán los datos</strong> (no se elimina lo existente).
           </p>
           
-          <div class="drop-zone" id="drop-zone" style="border: 2px dashed var(--glass-border); border-radius: var(--radius-lg); padding: var(--space-xl); text-align: center; cursor: pointer; transition: all var(--transition-fast); ${importFile ? 'border-color: var(--color-primary); background: rgba(59,130,246,0.05);' : ''}">
+          <div class="drop-zone" id="drop-zone" style="border: 2px dashed var(--line); border-radius: var(--r-lg); padding: var(--s-8); text-align: center; cursor: pointer; transition: all var(--dur-fast); ${importFile ? 'border-color: var(--accent); background: rgba(59,130,246,0.05);' : ''}">
             <input type="file" id="file-input" accept=".json" style="display: none;">
             ${importFile ? `
-              <div style="display: flex; align-items: center; justify-content: center; gap: var(--space-md); color: var(--text-primary);">
+              <div style="display: flex; align-items: center; justify-content: center; gap: var(--s-4); color: var(--ink);">
                 ${ICONS.database}
                 <div>
                   <div style="font-weight: 500;">${importFile.name}</div>
-                  <div style="font-size: var(--font-size-xs); color: var(--text-muted);">${formatFileSize(importFile.size)}</div>
+                  <div style="font-size: var(--text-xs); color: var(--ink-2);">${formatFileSize(importFile.size)}</div>
                 </div>
               </div>
             ` : `
               ${ICONS.upload}
-              <p style="margin: var(--space-sm) 0 0; color: var(--text-muted);">Arrastra un archivo JSON aquí o haz clic para seleccionar</p>
-              <p style="font-size: var(--font-size-xs); color: var(--text-subtle); margin-top: var(--space-xs);">Máx. 5 MB · .json</p>
+              <p style="margin: var(--s-2) 0 0; color: var(--ink-2);">Arrastra un archivo JSON aquí o haz clic para seleccionar</p>
+              <p style="font-size: var(--text-xs); color: var(--ink-3); margin-top: var(--s-1);">Máx. 5 MB · .json</p>
             `}
           </div>
           
           ${importStatus === 'success' ? `
-            <div style="margin-top: var(--space-md); padding: var(--space-md); background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); border-radius: var(--radius-md); color: var(--color-success); display: flex; align-items: center; gap: var(--space-sm);">
+            <div style="margin-top: var(--s-4); padding: var(--s-4); background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); border-radius: var(--r-md); color: var(--accent); display: flex; align-items: center; gap: var(--s-2);">
               <svg class="icon icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ${importMessage}
             </div>
           ` : importStatus === 'error' ? `
-            <div style="margin-top: var(--space-md); padding: var(--space-md); background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); border-radius: var(--radius-md); color: var(--color-danger); display: flex; align-items: center; gap: var(--space-sm);">
+            <div style="margin-top: var(--s-4); padding: var(--s-4); background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); border-radius: var(--r-md); color: var(--danger); display: flex; align-items: center; gap: var(--s-2);">
               <svg class="icon icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> ${importMessage}
             </div>
           ` : ''}
           
-          <div style="margin-top: var(--space-lg); padding: var(--space-md); background: var(--glass-bg-subtle); border-radius: var(--radius-md); border: 1px solid var(--glass-border); font-size: var(--font-size-xs); color: var(--text-muted);">
+          <div style="margin-top: var(--s-6); padding: var(--s-4); background: var(--surface-2); border-radius: var(--r-md); border: 1px solid var(--line); font-size: var(--text-xs); color: var(--ink-2);">
             <strong>Formato esperado:</strong> { tasks[], notes[], goals[], exportedAt?, version? }
           </div>
         </div>
@@ -177,28 +177,28 @@ export function DataManager({ onClose }) {
     if (activeTab !== 'clear') return '';
     
     return `
-      <div class="data-panel" data-panel="clear" style="animation: fadeIn var(--transition-fast);">
-        <div class="glass glass-danger" style="padding: var(--space-lg); border-radius: var(--radius-lg);">
-          <div style="display: flex; align-items: flex-start; gap: var(--space-md);">
+      <div class="data-panel" data-panel="clear" style="animation: fadeIn var(--dur-fast);">
+        <div class="glass glass-danger" style="padding: var(--s-6); border-radius: var(--r-lg);">
+          <div style="display: flex; align-items: flex-start; gap: var(--s-4);">
             <svg class="icon icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             <div style="flex: 1;">
-              <h3 style="margin: 0 0 var(--space-sm); color: var(--color-danger);">⚠️ Eliminar Todos los Datos</h3>
-              <p style="margin: 0 0 var(--space-lg); color: var(--text-secondary); font-size: var(--font-size-sm);">
+              <h3 style="margin: 0 0 var(--s-2); color: var(--danger);">⚠️ Eliminar Todos los Datos</h3>
+              <p style="margin: 0 0 var(--s-6); color: var(--ink-2); font-size: var(--text-sm);">
                 Esta acción <strong>no se puede deshacer</strong>. Se eliminarán permanentemente:
               </p>
-              <ul style="margin: 0 0 var(--space-lg); padding-left: var(--space-lg); color: var(--text-secondary); font-size: var(--font-size-sm); line-height: 2;">
+              <ul style="margin: 0 0 var(--s-6); padding-left: var(--s-6); color: var(--ink-2); font-size: var(--text-sm); line-height: 2;">
                 <li>Todas las tareas (${db.tasks.getStats().total})</li>
                 <li>Todas las notas (${db.notes.getStats().total})</li>
                 <li>Todas las metas y su historial (${db.goals.getStats().total})</li>
               </ul>
-              <p style="margin: 0; font-size: var(--font-size-xs); color: var(--text-muted);">
+              <p style="margin: 0; font-size: var(--text-xs); color: var(--ink-2);">
                 Se recomienda <strong>exportar un backup</strong> antes de continuar.
               </p>
             </div>
           </div>
           
-          <div style="margin-top: var(--space-lg); padding: var(--space-md); background: var(--glass-bg-subtle); border-radius: var(--radius-md); border: 1px solid var(--glass-border);">
-            <label class="checkbox" style="font-size: var(--font-size-sm);">
+          <div style="margin-top: var(--s-6); padding: var(--s-4); background: var(--surface-2); border-radius: var(--r-md); border: 1px solid var(--line);">
+            <label class="checkbox" style="font-size: var(--text-sm);">
               <input type="checkbox" class="checkbox__input" id="confirm-clear" required>
               <span class="checkbox__box"></span>
               <span class="checkbox__label"><strong>Confirmo que quiero eliminar TODOS mis datos permanentemente</strong></span>
@@ -243,7 +243,7 @@ export function DataManager({ onClose }) {
     dropZone?.addEventListener('click', () => fileInput?.click());
     dropZone?.addEventListener('dragover', (e) => {
       e.preventDefault();
-      dropZone.style.borderColor = 'var(--color-primary)';
+      dropZone.style.borderColor = 'var(--accent)';
       dropZone.style.background = 'rgba(59,130,246,0.1)';
     });
     dropZone?.addEventListener('dragleave', () => {

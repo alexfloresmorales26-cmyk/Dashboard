@@ -1,0 +1,15 @@
+{
+  "regions": [
+    { "id": "sidebar", "kind": "chrome", "grid": "A0:B9", "note": "left rail on white: logo 'Tablero' top, nav list Inicio (active, black + small blue square marker), Tareas, Notas, Metas; 'Datos' pinned at the bottom; hairline right divider" },
+    { "id": "headline", "kind": "text", "grid": "C0:F1", "note": "headline 'Lo de hoy' in heavy grotesque with subline 'domingo, 15 de noviembre · 2 tareas · 2 notas · 1 meta · 0 vencidas' in gray" },
+    { "id": "primary-button", "kind": "control", "grid": "I0:J1", "note": "solid blue rounded button '+ Nueva tarea', white label" },
+    { "id": "metrics-1", "kind": "text", "grid": "C2:D3", "note": "huge tabular numeral 2 with label 'Tareas totales' in gray, hairline box" },
+    { "id": "metrics-2", "kind": "text", "grid": "E2:F3", "note": "huge tabular numeral 2 with label 'Notas', hairline box" },
+    { "id": "metrics-3", "kind": "text", "grid": "G2:H3", "note": "huge tabular numeral 1 with label 'Meta · 1/1 hoy', hairline box" },
+    { "id": "metrics-4", "kind": "text", "grid": "I2:J3", "note": "huge tabular numeral 0 with label 'Vencidas', hairline box" },
+    { "id": "tasks-col", "kind": "control", "grid": "C3:F5", "note": "'TAREAS DE HOY' small-caps heading + three task rows: square checkbox, task text, right-aligned gray meta ('baja', 'baja', 'ayer'); third row checkbox filled black, text struck gray" },
+    { "id": "goals-block", "kind": "text", "grid": "F3:H4", "note": "'METAS · 1/1 HOY' heading; 'Beber agua' bold with right-aligned tabular '8/8 vasos'; thin blue progress bar fully filled; 'Racha: 1 día' gray line" },
+    { "id": "notes-block", "kind": "text", "grid": "F5:H5", "note": "'NOTAS' heading; two note entries: bold title line + gray timestamp line ('Sesión de trabajo (00:00:10)…', 'Nueva nota…')" },
+    { "id": "session-col", "kind": "control", "grid": "I3:J5", "note": "'SESIÓN' heading; huge tabular '00:00:00'; gray subline '00:00 – 02:00 · hoy'; three ghost circle buttons, middle filled blue (play)" }
+  ]
+}

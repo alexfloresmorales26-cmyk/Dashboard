@@ -32,33 +32,33 @@ export function GoalsTracker({ compact = false, maxItems = null, onNavigate }) {
     }
     
     container.innerHTML = `
-      <div class="goals-tracker__header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-md); flex-wrap: wrap; gap: var(--space-sm);">
-        <div style="display: flex; align-items: center; gap: var(--space-sm);">
-          <h2 style="margin: 0; font-size: ${compact ? 'var(--font-size-lg)' : 'var(--font-size-xl)'};">${ICONS.chart} Metas</h2>
+      <div class="goals-tracker__header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--s-4); flex-wrap: wrap; gap: var(--s-2);">
+        <div style="display: flex; align-items: center; gap: var(--s-2);">
+          <h2 style="margin: 0; font-size: ${compact ? 'var(--text-lg)' : 'var(--text-lg)'};">${ICONS.chart} Metas</h2>
           ${!compact ? `
-            <span class="badge badge--neutral" style="font-size: var(--font-size-xs);">${stats.completedToday}/${stats.daily} hoy</span>
+            <span class="badge badge--neutral" style="font-size: var(--text-xs);">${stats.completedToday}/${stats.daily} hoy</span>
           ` : ''}
         </div>
-        <div style="display: flex; gap: var(--space-xs); flex-wrap: wrap;">
+        <div style="display: flex; gap: var(--s-1); flex-wrap: wrap;">
           <select class="form-select form-select--sm" data-filter-period style="min-width: 140px;">
             <option value="all">Todas</option>
             <option value="daily">Diarias</option>
             <option value="weekly">Semanales</option>
           </select>
           ${!compact ? `
-            <button class="btn btn--primary btn--sm" data-add-goal style="display: flex; align-items: center; gap: var(--space-xs);">
+            <button class="btn btn--primary btn--sm" data-add-goal style="display: flex; align-items: center; gap: var(--s-1);">
               ${ICONS.plus} Nueva
             </button>
           ` : ''}
         </div>
       </div>
       
-      <div class="goals-tracker__list" style="display: flex; flex-direction: column; gap: ${compact ? 'var(--space-sm)' : 'var(--space-md)'};" data-goals-list>
+      <div class="goals-tracker__list" style="display: flex; flex-direction: column; gap: ${compact ? 'var(--s-2)' : 'var(--s-4)'};" data-goals-list>
         ${filteredGoals.length === 0 ? renderEmptyState() : ''}
       </div>
       
       ${maxItems && goals.length > maxItems ? `
-        <div style="text-align: center; margin-top: var(--space-md);">
+        <div style="text-align: center; margin-top: var(--s-4);">
           <button class="btn btn--ghost btn--sm" data-view-all>Ver todas (${goals.length}) →</button>
         </div>
       ` : ''}
@@ -90,28 +90,28 @@ export function GoalsTracker({ compact = false, maxItems = null, onNavigate }) {
   
   function renderEmptyState() {
     return `
-      <div class="empty-state" style="padding: var(--space-lg); text-align: center; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+      <div class="empty-state" style="padding: var(--s-6); text-align: center; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;">
         <div class="empty-state__icon">${ICONS.chart}</div>
-        <h3 class="empty-state__title" style="margin: var(--space-sm) 0;">${filterPeriod !== 'all' ? 'Sin metas en este período' : 'Sin metas diarias'}</h3>
-        <p class="empty-state__description" style="font-size: var(--font-size-sm); max-width: 280px;">
+        <h3 class="empty-state__title" style="margin: var(--s-2) 0;">${filterPeriod !== 'all' ? 'Sin metas en este período' : 'Sin metas diarias'}</h3>
+        <p class="empty-state__description" style="font-size: var(--text-sm); max-width: 280px;">
           ${filterPeriod !== 'all' ? `No hay metas ${filterPeriod === 'daily' ? 'diarias' : 'semanales'}` : 'Añade metas para rastrear hábitos: agua, pasos, lectura, etc.'}
         </p>
-        <button class="btn btn--primary empty-state__action" data-add-goal style="margin-top: var(--space-md);">${ICONS.plus} Crear primera meta</button>
+        <button class="btn btn--primary empty-state__action" data-add-goal style="margin-top: var(--s-4);">${ICONS.plus} Crear primera meta</button>
       </div>
     `;
   }
   
   function renderStatsSummary(stats) {
     return `
-      <div class="goals-tracker__stats" style="margin-top: var(--space-lg); padding: var(--space-md); background: var(--color-bg); border-radius: var(--radius-md); border: 1px solid var(--color-border);">
-        <h4 style="font-size: var(--font-size-sm); font-weight: 600; color: var(--color-fg-muted); margin-bottom: var(--space-sm);">Resumen</h4>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: var(--space-sm); font-size: var(--font-size-sm);">
-          <div><span style="color: var(--color-fg-muted);">Total metas:</span> <strong>${stats.total}</strong></div>
-          <div><span style="color: var(--color-fg-muted);">Diarias:</span> <strong>${stats.daily}</strong></div>
-          <div><span style="color: var(--color-fg-muted);">Semanales:</span> <strong>${stats.weekly}</strong></div>
-          <div><span style="color: var(--color-fg-muted);">Completadas hoy:</span> <strong style="color: var(--color-success);">${stats.completedToday}</strong></div>
-          <div><span style="color: var(--color-fg-muted);">Racha total:</span> <strong>${stats.totalStreak} días</strong></div>
-          <div><span style="color: var(--color-fg-muted);">Mejor racha:</span> <strong>${stats.bestStreak} días</strong></div>
+      <div class="goals-tracker__stats" style="margin-top: var(--s-6); padding: var(--s-4); background: var(--bg); border-radius: var(--r-md); border: 1px solid var(--line);">
+        <h4 style="font-size: var(--text-sm); font-weight: 600; color: var(--ink-2); margin-bottom: var(--s-2);">Resumen</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: var(--s-2); font-size: var(--text-sm);">
+          <div><span style="color: var(--ink-2);">Total metas:</span> <strong>${stats.total}</strong></div>
+          <div><span style="color: var(--ink-2);">Diarias:</span> <strong>${stats.daily}</strong></div>
+          <div><span style="color: var(--ink-2);">Semanales:</span> <strong>${stats.weekly}</strong></div>
+          <div><span style="color: var(--ink-2);">Completadas hoy:</span> <strong style="color: var(--accent);">${stats.completedToday}</strong></div>
+          <div><span style="color: var(--ink-2);">Racha total:</span> <strong>${stats.totalStreak} días</strong></div>
+          <div><span style="color: var(--ink-2);">Mejor racha:</span> <strong>${stats.bestStreak} días</strong></div>
         </div>
       </div>
     `;
@@ -142,6 +142,7 @@ export function GoalsTracker({ compact = false, maxItems = null, onNavigate }) {
     const form = GoalForm({
       goal: editGoal,
       onClose: () => {
+        form.destroy?.();
         overlay.remove();
       },
       onSubmit: (idOrData, data) => {
@@ -151,6 +152,7 @@ export function GoalsTracker({ compact = false, maxItems = null, onNavigate }) {
           // GoalForm llama onSubmit(data) al crear (un solo argumento)
           db.goals.create(idOrData);
         }
+        form.destroy?.();
         overlay.remove();
       }
     });
@@ -196,28 +198,28 @@ export function GoalsTracker({ compact = false, maxItems = null, onNavigate }) {
           </button>
         </header>
         <div class="modal__body" style="max-height: 60vh; overflow: auto;">
-          <div style="margin-bottom: var(--space-lg); padding: var(--space-md); background: var(--color-bg); border-radius: var(--radius-md);">
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); text-align: center;">
+          <div style="margin-bottom: var(--s-6); padding: var(--s-4); background: var(--bg); border-radius: var(--r-md);">
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-4); text-align: center;">
               <div>
-                <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--color-success);">${completedCount}</div>
-                <div style="font-size: var(--font-size-xs); color: var(--color-fg-muted);">Días completados</div>
+                <div style="font-size: var(--text-lg); font-weight: 700; color: var(--accent);">${completedCount}</div>
+                <div style="font-size: var(--text-xs); color: var(--ink-2);">Días completados</div>
               </div>
               <div>
-                <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--color-primary);">${goal.streak}</div>
-                <div style="font-size: var(--font-size-xs); color: var(--color-fg-muted);">Racha actual</div>
+                <div style="font-size: var(--text-lg); font-weight: 700; color: var(--accent);">${goal.streak}</div>
+                <div style="font-size: var(--text-xs); color: var(--ink-2);">Racha actual</div>
               </div>
               <div>
-                <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--color-warning);">${bestStreak}</div>
-                <div style="font-size: var(--font-size-xs); color: var(--color-fg-muted);">Mejor racha</div>
+                <div style="font-size: var(--text-lg); font-weight: 700; color: var(--ink-2);">${bestStreak}</div>
+                <div style="font-size: var(--text-xs); color: var(--ink-2);">Mejor racha</div>
               </div>
             </div>
           </div>
           
-          <h4 style="font-size: var(--font-size-sm); font-weight: 600; color: var(--color-fg-muted); margin-bottom: var(--space-sm);">Últimos 30 días</h4>
+          <h4 style="font-size: var(--text-sm); font-weight: 600; color: var(--ink-2); margin-bottom: var(--s-2);">Últimos 30 días</h4>
           <div style="display: flex; flex-wrap: wrap; gap: 4px;">
             ${history.map(day => `
               <button class="history-day ${day.completed ? 'history-day--completed' : ''}" 
-                      style="width: 44px; height: 44px; border-radius: var(--radius-sm); border: 1px solid var(--color-border); background: ${day.completed ? 'var(--color-success-light)' : 'var(--color-bg)'}; color: ${day.completed ? 'var(--color-success)' : 'var(--color-fg-muted)'}; font-size: 11px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: default;"
+                      style="width: 44px; height: 44px; border-radius: var(--r-sm); border: 1px solid var(--line); background: ${day.completed ? 'var(--accent)' : 'var(--bg)'}; color: ${day.completed ? 'var(--accent)' : 'var(--ink-2)'}; font-size: 11px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: default;"
                       title="${day.date}: ${day.completed ? 'Completado' : 'Pendiente'}">
                 <span style="font-weight: 600;">${day.date.slice(8)}</span>
                 <span style="font-size: 9px;">${day.completed ? '✓' : ''}</span>

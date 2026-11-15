@@ -4,7 +4,6 @@
  */
 
 import { GoalsTracker } from '../components/Goals/GoalsTracker.js';
-import { db } from '../store/index.js';
 import { ICONS } from '../components/Header/Header.js';
 
 const ICONS_EXTRA = {
@@ -29,17 +28,17 @@ export class GoalsView {
     const stats = this.db.goals.getStats();
     
     this.element.innerHTML = `
-      <header class="view__header" style="display: flex; align-items: center; justify-content: space-between; padding: var(--space-lg); border-bottom: 1px solid var(--color-border); flex-shrink: 0; flex-wrap: wrap; gap: var(--space-md);">
+      <header class="view__header" style="display: flex; align-items: center; justify-content: space-between; padding: var(--s-6); border-bottom: 1px solid var(--line); flex-shrink: 0; flex-wrap: wrap; gap: var(--s-4);">
         <div class="view__title-group">
-          <h1 class="view__title" style="display: flex; align-items: center; gap: var(--space-sm); margin: 0; font-size: var(--font-size-2xl);">${ICONS.target} Metas diarias</h1>
-          <span class="view__count" style="color: var(--color-fg-muted); font-size: var(--font-size-lg); font-weight: 400;">${stats.completedToday}/${stats.daily} completadas · Racha total: ${stats.totalStreak} días</span>
+          <h1 class="view__title" style="display: flex; align-items: center; gap: var(--s-2); margin: 0; font-size: var(--text-lg);">${ICONS.target} Metas diarias</h1>
+          <span class="view__count" style="color: var(--ink-2); font-size: var(--text-lg); font-weight: 400;">${stats.completedToday}/${stats.daily} completadas · Racha total: ${stats.totalStreak} días</span>
         </div>
-        <button class="btn btn--primary" data-action="add-goal" style="display: flex; align-items: center; gap: var(--space-sm);">
+        <button class="btn btn--primary" data-action="add-goal" style="display: flex; align-items: center; gap: var(--s-2);">
           ${ICONS_EXTRA.plus} Nueva meta
         </button>
       </header>
       
-      <main class="view__content" style="flex: 1; overflow: auto; padding: var(--space-lg);" data-tracker-container></main>
+      <main class="view__content" style="flex: 1; overflow: auto; padding: var(--s-6);" data-tracker-container></main>
     `;
     
     // Inicializar GoalsTracker completo

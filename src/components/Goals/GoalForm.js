@@ -2,9 +2,6 @@
  * GoalForm - Formulario modal para crear/editar metas
  */
 
-import { nanoid } from '../../utils/id.js';
-import { db } from '../../store/index.js';
-
 const ICONS = {
   close: '<svg class="icon icon--md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
 };
@@ -41,7 +38,7 @@ export function GoalForm({ goal = null, onClose, onSubmit }) {
                value="${escapeHtml(initialTitle)}" autocomplete="off">
       </div>
       
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4);">
         <div class="form-group">
           <label class="form-label" for="goal-target">Objetivo *</label>
           <input type="number" class="form-input" id="goal-target" name="target" min="1" step="1" 
@@ -61,7 +58,7 @@ export function GoalForm({ goal = null, onClose, onSubmit }) {
         </div>
       </div>
       
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4);">
         <div class="form-group">
           <label class="form-label" for="goal-period">Período</label>
           <select class="form-select" id="goal-period" name="period">

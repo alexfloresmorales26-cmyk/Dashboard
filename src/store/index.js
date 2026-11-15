@@ -5,7 +5,7 @@
 
 import { createStore } from '../utils/reactive.js';
 import { nanoid } from '../utils/id.js';
-import { nowISO, todayString } from '../utils/date.js';
+import { nowISO } from '../utils/date.js';
 import { tasksStore } from './tasks.js';
 import { notesStore } from './notes.js';
 import { goalsStore } from './goals.js';
@@ -19,7 +19,7 @@ const defaultState = {
   tasks: [],
   notes: [],
   goals: [],
-  theme: 'dark',
+  theme: 'light',
   view: 'dashboard',
   version: STORAGE_VERSION
 };
@@ -41,20 +41,23 @@ function loadFromStorage() {
     }
     
     // Validar estructura básica.
-    // Migración única: versiones anteriores persistían theme='light', pero el
-    // diseño real de la app es el tema oscuro. Se restaura a oscuro una sola
-    // vez (themeMigrated evita forzarlo de nuevo si el usuario cambia a claro).
-    let theme = parsed.theme || 'dark';
-    const themeMigrated = Boolean(parsed.themeMigrated);
-    if (!themeMigrated) {
-      theme = 'dark';
-    }
+    // Migraciones de tema, una sola vez cada una:
+    //  - themeMigrated: versiones antiguas persistían 'light' y el mundo
+    //    glassmorphism era oscuro por defecto.
+    //  - worldMigrated: el rediseño monocromo sustituye a ese mundo; su tema
+    //    por defecto es el claro, así que el 'dark' heredado se descarta una
+    //    vez y el usuario elige a partir de ahí.
+    let theme = parsed.theme || 'light';
+    if (!parsed.themeMigrated) theme = 'dark';
+    const worldMigrated = Boolean(parsed.worldMigrated);
+    if (!worldMigrated) theme = 'light';
     return {
       tasks: Array.isArray(parsed.tasks) ? parsed.tasks : [],
       notes: Array.isArray(parsed.notes) ? parsed.notes : [],
       goals: Array.isArray(parsed.goals) ? parsed.goals : [],
       theme,
-      themeMigrated,
+      themeMigrated: true,
+      worldMigrated,
       view: parsed.view || 'dashboard',
       version: STORAGE_VERSION
     };
@@ -75,6 +78,7 @@ function saveToStorage(state) {
       goals: state.goals,
       theme: state.theme,
       themeMigrated: true,
+      worldMigrated: true,
       view: state.view,
       version: STORAGE_VERSION
     };
@@ -144,9 +148,10 @@ export const db = {
   importData(jsonString) {
     try {
       const data = JSON.parse(jsonString);
-      if (data.tasks) store.set('tasks', data.tasks);
-      if (data.notes) store.set('notes', data.notes);
-      if (data.goals) store.set('goals', data.goals);
+      // Validar tipos: importar basura corrompería el estado y crashearía el render
+      if (Array.isArray(data.tasks)) store.set('tasks', data.tasks);
+      if (Array.isArray(data.notes)) store.set('notes', data.notes);
+      if (Array.isArray(data.goals)) store.set('goals', data.goals);
       return true;
     } catch (e) {
       console.error('[Store] Error importando:', e);
@@ -155,7 +160,7 @@ export const db = {
   },
   
   // Helpers para crear IDs consistentes
-  generateId: (prefix) => nanoid(12)
+  generateId: () => nanoid(12)
 };
 
 // Inicializar tema en DOM

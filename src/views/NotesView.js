@@ -3,9 +3,6 @@
  * Usa NoteEditor y NoteCard components
  */
 
-import { db } from '../store/index.js';
-import { formatRelativeDate } from '../utils/date.js';
-import { nanoid } from '../utils/id.js';
 import { ICONS } from '../components/Header/Header.js';
 import { NoteEditor } from '../components/Notes/NoteEditor.js';
 import { NoteCard } from '../components/Notes/NoteCard.js';
@@ -51,17 +48,17 @@ export class NotesView {
     const selectedNote = this.selectedNoteId ? this.db.notes.getById(this.selectedNoteId) : null;
     
     return `
-      <header class="view__header" style="display: flex; align-items: center; justify-content: space-between; padding: var(--space-lg); border-bottom: 1px solid var(--color-border); flex-shrink: 0; flex-wrap: wrap; gap: var(--space-md);">
+      <header class="view__header" style="display: flex; align-items: center; justify-content: space-between; padding: var(--s-6); border-bottom: 1px solid var(--line); flex-shrink: 0; flex-wrap: wrap; gap: var(--s-4);">
         <div class="view__title-group">
-          <h1 class="view__title" style="display: flex; align-items: center; gap: var(--space-sm); margin: 0; font-size: var(--font-size-2xl);">${ICONS.fileText} Notas</h1>
-          <span class="view__count" style="color: var(--color-fg-muted); font-size: var(--font-size-lg); font-weight: 400;">${stats.total} notas · ${stats.pinned} fijadas</span>
+          <h1 class="view__title" style="display: flex; align-items: center; gap: var(--s-2); margin: 0; font-size: var(--text-lg);">${ICONS.fileText} Notas</h1>
+          <span class="view__count" style="color: var(--ink-2); font-size: var(--text-lg); font-weight: 400;">${stats.total} notas · ${stats.pinned} fijadas</span>
         </div>
-        <button class="btn btn--primary" data-action="add-note" style="display: flex; align-items: center; gap: var(--space-sm);">
+        <button class="btn btn--primary" data-action="add-note" style="display: flex; align-items: center; gap: var(--s-2);">
           ${ICONS_EXTRA.plus} Nueva nota
         </button>
       </header>
       
-      <div class="view__toolbar" style="display: flex; flex-wrap: wrap; gap: var(--space-md); padding: var(--space-sm) var(--space-lg); border-bottom: 1px solid var(--color-border); background: var(--color-bg); flex-shrink: 0;">
+      <div class="view__toolbar" style="display: flex; flex-wrap: wrap; gap: var(--s-4); padding: var(--s-2) var(--s-6); border-bottom: 1px solid var(--line); background: var(--bg); flex-shrink: 0;">
         <!-- Búsqueda -->
         <div class="toolbar__search" style="flex: 1; min-width: 250px; position: relative;">
           <label class="search-input-wrapper" style="width: 100%;">
@@ -71,15 +68,15 @@ export class NotesView {
         </div>
         
         <!-- Filtros rápidos -->
-        <div class="toolbar__filters" style="display: flex; flex-wrap: wrap; gap: var(--space-sm); align-items: center;">
+        <div class="toolbar__filters" style="display: flex; flex-wrap: wrap; gap: var(--s-2); align-items: center;">
           ${this.renderFiltersHtml(allTags)}
         </div>
       </div>
       
       <div class="view__content" style="display: flex; flex: 1; overflow: hidden; min-height: 0;">
         <!-- Panel lista (sidebar) -->
-        <aside class="notes-sidebar" style="width: 350px; max-width: 40%; min-width: 280px; border-right: 1px solid var(--color-border); display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0;">
-          <div class="notes-list" style="flex: 1; overflow: auto; padding: var(--space-sm);" data-notes-list></div>
+        <aside class="notes-sidebar" style="width: 350px; max-width: 40%; min-width: 280px; border-right: 1px solid var(--line); display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0;">
+          <div class="notes-list" style="flex: 1; overflow: auto; padding: var(--s-2);" data-notes-list></div>
         </aside>
         
         <!-- Panel editor/preview -->
@@ -102,7 +99,8 @@ export class NotesView {
     }
     
     // Ordenar: fijadas primero, luego por fecha actualización desc
-    return notes.sort((a, b) => {
+    // (copia: notes puede ser el array del store y sort() lo mutaría)
+    return [...notes].sort((a, b) => {
       if (a.isPinned !== b.isPinned) return b.isPinned - a.isPinned;
       return new Date(b.updatedAt) - new Date(a.updatedAt);
     });
@@ -128,23 +126,23 @@ export class NotesView {
   
   renderEmptyNotes() {
     return `
-      <div class="empty-state" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: var(--space-lg); text-align: center;">
+      <div class="empty-state" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: var(--s-6); text-align: center;">
         <div class="empty-state__icon">${ICONS.fileText}</div>
-        <h3 class="empty-state__title" style="margin: var(--space-sm) 0;">${this.searchQuery || this.activeTag ? 'Sin resultados' : 'Sin notas'}</h3>
-        <p class="empty-state__description" style="font-size: var(--font-size-sm); max-width: 280px;">
+        <h3 class="empty-state__title" style="margin: var(--s-2) 0;">${this.searchQuery || this.activeTag ? 'Sin resultados' : 'Sin notas'}</h3>
+        <p class="empty-state__description" style="font-size: var(--text-sm); max-width: 280px;">
           ${this.searchQuery ? 'No se encontraron notas con ese término' : this.activeTag ? `Sin notas con tag "${this.activeTag}"` : 'Crea tu primera nota en Markdown'}
         </p>
-        <button class="btn btn--primary empty-state__action" data-action="add-note" style="margin-top: var(--space-md);">${ICONS_EXTRA.plus} Nueva nota</button>
+        <button class="btn btn--primary empty-state__action" data-action="add-note" style="margin-top: var(--s-4);">${ICONS_EXTRA.plus} Nueva nota</button>
       </div>
     `;
   }
   
   renderWelcome() {
     return `
-      <div class="editor-welcome" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: var(--space-2xl); text-align: center; color: var(--color-fg-muted);">
-        <div class="empty-state__icon" style="margin-bottom: var(--space-lg);">${ICONS.fileText}</div>
-        <h2 style="font-size: var(--font-size-2xl); color: var(--color-fg); margin-bottom: var(--space-sm);">Bienvenido al editor</h2>
-        <p style="max-width: 400px; line-height: var(--line-height-relaxed); margin-bottom: var(--space-lg);">
+      <div class="editor-welcome" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: var(--s-9); text-align: center; color: var(--ink-2);">
+        <div class="empty-state__icon" style="margin-bottom: var(--s-6);">${ICONS.fileText}</div>
+        <h2 style="font-size: var(--text-lg); color: var(--ink); margin-bottom: var(--s-2);">Bienvenido al editor</h2>
+        <p style="max-width: 400px; line-height: var(--leading-snug); margin-bottom: var(--s-6);">
           Selecciona una nota de la lista o crea una nueva para empezar a escribir en Markdown con vista previa en tiempo real.
         </p>
         <button class="btn btn--primary" data-action="add-note">${ICONS_EXTRA.plus} Crear primera nota</button>

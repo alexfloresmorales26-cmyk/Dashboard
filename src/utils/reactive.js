@@ -27,14 +27,11 @@ export function signal(initialValue) {
 }
 
 export function computed(fn, deps = []) {
-  const { get, subscribe } = signal(fn());
+  const store = signal(fn());
   
   const update = () => {
-    const newValue = fn();
-    if (newValue !== get()) {
-      // Usamos set interno accediendo al closure
-      // Nota: signal no expone set directo, recreamos
-    }
+    // signal.set notifica a los suscriptores solo si el valor cambió
+    store.set(fn());
   };
   
   // Suscribirse a dependencias si son signals
@@ -43,9 +40,9 @@ export function computed(fn, deps = []) {
     .map(dep => dep.subscribe(update));
   
   return {
-    get,
+    get: store.get,
     subscribe: (fn) => {
-      const unsub = subscribe(fn);
+      const unsub = store.subscribe(fn);
       return () => {
         unsub();
         unsubscribers.forEach(u => u());

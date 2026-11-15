@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="dark">
+<html lang="es" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Tablero Personal de Productividad - Tareas, Notas Markdown y Metas Diarias">
-  <meta name="theme-color" content="#0f0f13">
-  <title>Tablero de Productividad</title>
+  <meta name="description" content="Tablero - Tareas, Notas Markdown y Metas Diarias">
+  <meta name="theme-color" content="#fafafa">
+  <title>Tablero</title>
   <script>
     /* Guardián de versión: el HTML llega siempre fresco (network-first), así
        que este script corre antes que los assets. Si hay una versión nueva y
@@ -13,7 +13,7 @@
        recarga una vez para servir todo actualizado. Evita quedarse pegado a
        versiones viejas cacheadas por el Service Worker. */
     (function () {
-      var APP_VERSION = '2'; // bump junto con CACHE_NAME de sw.js
+      var APP_VERSION = '3'; // bump junto con CACHE_NAME de sw.js
       try {
         if (localStorage.getItem('app-version') === APP_VERSION) return;
         localStorage.setItem('app-version', APP_VERSION);
@@ -34,7 +34,7 @@
       } catch (e) { /* noop */ }
     })();
   </script>
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="/manifest.json">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <link rel="stylesheet" href="/src/styles/variables.css">
@@ -42,23 +42,14 @@
   <link rel="stylesheet" href="/src/styles/layout.css">
   <link rel="stylesheet" href="/src/styles/components.css">
   <link rel="stylesheet" href="/src/styles/navigation.css">
-  <link rel="stylesheet" href="/src/styles/theme-dark.css?v=2">
 </head>
 <body>
-  <div id="app" class="app app--with-sidebar">
-    <!-- Barra lateral fija (desktop) -->
+  <div id="app" class="app">
+    <!-- Barra lateral (desktop) -->
     <aside id="sidebar" class="nav-sidebar" role="navigation" aria-label="Navegación principal"></aside>
-    
-    <!-- Header se inyecta aquí -->
-    <header id="header" class="header"></header>
-    
-    <!-- Breadcrumbs / ruta actual -->
-    <nav id="breadcrumbs" class="breadcrumbs" aria-label="Ruta actual"></nav>
-    
-    <!-- Layout principal del dashboard -->
-    <main id="main" role="main">
-      <!-- Se inyecta DashboardView -->
-    </main>
+
+    <!-- Vistas -->
+    <main id="main" role="main"></main>
   </div>
 
   <script type="module" src="/src/main.js"></script>

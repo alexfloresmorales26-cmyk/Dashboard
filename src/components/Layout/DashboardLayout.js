@@ -3,7 +3,6 @@
  * Contenedor principal para las 3 secciones del dashboard
  */
 
-import { db } from '../../store/index.js';
 import { ICONS } from '../Header/Header.js';
 
 export function DashboardLayout({ }) {

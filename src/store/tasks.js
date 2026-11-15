@@ -3,7 +3,7 @@
  */
 
 import { nanoid } from '../utils/id.js';
-import { nowISO, todayString, isPast, formatRelativeDate } from '../utils/date.js';
+import { nowISO, todayString } from '../utils/date.js';
 
 /**
  * Crea store de tareas con API tipada
@@ -175,7 +175,6 @@ export function tasksStore(parentStore) {
   function clearCompleted(olderThanDays = 30) {
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - olderThanDays);
-    const cutoffISO = cutoff.toISOString();
     
     const tasks = getAll();
     const toKeep = tasks.filter(t => 

@@ -2,8 +2,7 @@
  * TaskForm - Formulario modal/inline para crear/editar tareas
  */
 
-import { nanoid } from '../../utils/id.js';
-import { todayString, formatDate, toDateInputValue } from '../../utils/date.js';
+import { toDateInputValue } from '../../utils/date.js';
 import { db } from '../../store/index.js';
 
 const ICONS = {
@@ -16,6 +15,16 @@ export function TaskForm({ task = null, onClose, onSubmit }) {
   const isEditing = !!task;
   const form = document.createElement('form');
   form.className = 'modal';
+  const escapeHtml = (text) => {
+    const div = document.createElement('div');
+    div.textContent = text ?? '';
+    return div.innerHTML;
+  };
+
+  const titleValue = escapeHtml(task?.title || '');
+  const descValue = escapeHtml(task?.description || '');
+  const categoryValue = escapeHtml(task?.category || '');
+
   form.innerHTML = `
     <header class="modal__header">
       <h2 class="modal__title">${isEditing ? 'Editar tarea' : 'Nueva tarea'}</h2>
@@ -25,16 +34,16 @@ export function TaskForm({ task = null, onClose, onSubmit }) {
       <div class="form-group">
         <label class="form-label" for="task-title">Título *</label>
         <input type="text" class="form-input" id="task-title" name="title" required 
-               placeholder="¿Qué necesitas hacer?" value="${task?.title || ''}" autocomplete="off">
+               placeholder="¿Qué necesitas hacer?" value="${titleValue}" autocomplete="off">
       </div>
       
       <div class="form-group">
         <label class="form-label" for="task-description">Descripción</label>
         <textarea class="form-textarea" id="task-description" name="description" 
-                  placeholder="Detalles adicionales... (opcional)" rows="3">${task?.description || ''}</textarea>
+                  placeholder="Detalles adicionales... (opcional)" rows="3">${descValue}</textarea>
       </div>
       
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4);">
         <div class="form-group">
           <label class="form-label">Prioridad</label>
           <select class="form-select" name="priority">
@@ -57,12 +66,12 @@ export function TaskForm({ task = null, onClose, onSubmit }) {
       
       <div class="form-group">
         <label class="form-label" for="task-category">Categoría ${ICONS.tag}</label>
-        <div style="display: flex; gap: var(--space-sm); flex-wrap: wrap;">
+        <div style="display: flex; gap: var(--s-2); flex-wrap: wrap;">
           <input type="text" class="form-input" id="task-category" name="category" 
                  placeholder="Ej: trabajo, personal, estudio..." 
-                 value="${task?.category || ''}" list="categories" style="flex: 1; min-width: 150px;">
+                 value="${categoryValue}" list="categories" style="flex: 1; min-width: 150px;">
           <datalist id="categories">
-            ${db.tasks.getCategories().map(c => `<option value="${c}">`).join('')}
+            ${db.tasks.getCategories().map(c => `<option value="${escapeHtml(c)}">`).join('')}
           </datalist>
         </div>
       </div>

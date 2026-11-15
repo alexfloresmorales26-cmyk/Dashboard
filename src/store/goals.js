@@ -3,11 +3,10 @@
  */
 
 import { nanoid } from '../utils/id.js';
-import { nowISO, todayString, startOfDay, diffDays } from '../utils/date.js';
+import { nowISO, todayString } from '../utils/date.js';
 
 export function goalsStore(parentStore) {
   const KEY = 'goals';
-  const STREAK_KEY = 'goals_streak_data'; // Para persistir rachas entre sesiones
   
   const getAll = () => parentStore.get(KEY) || [];
   const setAll = (goals) => parentStore.set(KEY, goals);

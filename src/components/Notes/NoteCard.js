@@ -4,7 +4,6 @@
 
 import { formatRelativeDate } from '../../utils/date.js';
 import { getFirstParagraph } from '../../utils/markdown.js';
-import { ICONS } from '../Header/Header.js';
 
 const ICONS_EXTRA = {
   pin: '<svg class="icon icon--xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M9 11a6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6-6"/></svg>',
@@ -19,33 +18,33 @@ export function NoteCard({ note, onSelect, onPin, onEdit, onDelete, onDuplicate 
   card.className = 'card note-card';
   card.dataset.noteId = note.id;
   card.style.cursor = 'pointer';
-  card.style.transition = 'all var(--transition-fast)';
+  card.style.transition = 'all var(--dur-fast)';
   
   const preview = getFirstParagraph(note.content, 160);
   const updated = formatRelativeDate(note.updatedAt);
   const tagsHtml = note.tags.slice(0, 4).map(tag => 
-    `<span class="badge badge--neutral" style="font-size: var(--font-size-xs);">${ICONS_EXTRA.tag} ${escapeHtml(tag)}</span>`
+    `<span class="badge badge--neutral" style="font-size: var(--text-xs);">${ICONS_EXTRA.tag} ${escapeHtml(tag)}</span>`
   ).join(' ');
   
   card.innerHTML = `
-    <div class="card__content" style="padding: var(--space-md);">
-      <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-sm); margin-bottom: var(--space-xs);">
-        <h3 class="card__title" style="font-size: var(--font-size-base); font-weight: 600; margin: 0; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+    <div class="card__content" style="padding: var(--s-4);">
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s-2); margin-bottom: var(--s-1);">
+        <h3 class="card__title" style="font-size: var(--text-base); font-weight: 600; margin: 0; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
           ${escapeHtml(note.title)}
-          ${note.isPinned ? `<span class="badge badge--primary" style="font-size: var(--font-size-xs); margin-left: var(--space-xs);">${ICONS_EXTRA.pin} Fijada</span>` : ''}
+          ${note.isPinned ? `<span class="badge badge--primary" style="font-size: var(--text-xs); margin-left: var(--s-1);">${ICONS_EXTRA.pin} Fijada</span>` : ''}
         </h3>
-        <div style="display: flex; gap: 2px; flex-shrink: 0; opacity: 0; transition: opacity var(--transition-fast);" class="note-card__actions">
+        <div style="display: flex; gap: 2px; flex-shrink: 0; opacity: 0; transition: opacity var(--dur-fast);" class="note-card__actions">
           <button class="btn btn--ghost btn--icon btn--sm ${note.isPinned ? 'btn--primary' : ''}" data-pin title="${note.isPinned ? 'Quitar fijada' : 'Fijar nota'}" aria-label="${note.isPinned ? 'Quitar fijada' : 'Fijar nota'}">${ICONS_EXTRA.pin}</button>
           <button class="btn btn--ghost btn--icon btn--sm" data-edit title="Editar" aria-label="Editar">${ICONS_EXTRA.edit}</button>
           <button class="btn btn--ghost btn--icon btn--sm" data-duplicate title="Duplicar" aria-label="Duplicar">${ICONS_EXTRA.duplicate}</button>
           <button class="btn btn--ghost btn--icon btn--sm btn--danger" data-delete title="Eliminar" aria-label="Eliminar">${ICONS_EXTRA.delete}</button>
         </div>
       </div>
-      ${tagsHtml ? `<div style="display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-bottom: var(--space-sm); font-size: var(--font-size-xs);">${tagsHtml}</div>` : ''}
-      <p style="font-size: var(--font-size-sm); color: var(--color-fg-muted); line-height: var(--line-height-relaxed); margin: 0 0 var(--space-sm); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
-        ${escapeHtml(preview) || '<em style="color: var(--color-fg-subtle);">(vacía)</em>'}
+      ${tagsHtml ? `<div style="display: flex; flex-wrap: wrap; gap: var(--s-1); margin-bottom: var(--s-2); font-size: var(--text-xs);">${tagsHtml}</div>` : ''}
+      <p style="font-size: var(--text-sm); color: var(--ink-2); line-height: var(--leading-snug); margin: 0 0 var(--s-2); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+        ${escapeHtml(preview) || '<em style="color: var(--ink-3);">(vacía)</em>'}
       </p>
-      <div style="font-size: var(--font-size-xs); color: var(--color-fg-subtle); display: flex; align-items: center; justify-content: space-between;">
+      <div style="font-size: var(--text-xs); color: var(--ink-3); display: flex; align-items: center; justify-content: space-between;">
         <span>${updated}</span>
         ${note.isPinned ? `<span class="badge badge--primary" style="font-size: 10px;">${ICONS_EXTRA.pin}</span>` : ''}
       </div>

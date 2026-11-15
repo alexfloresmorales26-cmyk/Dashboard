@@ -3,7 +3,6 @@
  * GLASSMORPHISM EDITION
  */
 
-import { db } from '../../store/index.js';
 import { DataManager } from '../DataManager/DataManager.js';
 import { formatDate, getDayName } from '../../utils/date.js';
 
@@ -183,24 +182,24 @@ export function Header({ db, onNavigate }) {
     overlay.innerHTML = `
       <div class="modal" style="max-width: 480px;">
         <header class="modal__header"><h2 class="modal__title">⌨ Atajos de teclado</h2><button class="btn btn--ghost btn--icon modal__close" data-close aria-label="Cerrar"><svg class="icon icon--md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></header>
-        <div class="modal__body" style="padding: var(--space-lg);">
-          <div style="display: grid; grid-template-columns: auto 1fr; gap: var(--space-md) var(--space-lg); font-size: var(--font-size-sm);">
-            <kbd style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">D</kbd><span>Dashboard</span>
-            <kbd style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">1</kbd><span>Tareas</span>
-            <kbd style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">2</kbd><span>Notas</span>
-            <kbd style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">3</kbd><span>Metas</span>
-            <kbd style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">T</kbd><span>Tema</span>
-            <kbd style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">A</kbd><span>Nueva tarea</span>
-            <kbd style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">N</kbd><span>Nueva nota</span>
-            <kbd style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">G</kbd><span>Nueva meta</span>
-            <kbd style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">?</kbd><span>Ayuda</span>
-            <hr style="grid-column: 1 / -1; margin: var(--space-md) 0; border-color: var(--glass-border);">
-            <span style="font-weight: 600; color: var(--text-muted);">En editor:</span><span></span>
-            <kbd style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">Ctrl+B</kbd><span>Negrita</span>
-            <kbd style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">Ctrl+I</kbd><span>Cursiva</span>
-            <kbd style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">Ctrl+K</kbd><span>Enlace</span>
-            <kbd style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">Ctrl+S</kbd><span>Guardar</span>
-            <kbd style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono);">Escape</kbd><span>Cerrar</span>
+        <div class="modal__body" style="padding: var(--s-6);">
+          <div style="display: grid; grid-template-columns: auto 1fr; gap: var(--s-4) var(--s-6); font-size: var(--text-sm);">
+            <kbd style="background: var(--surface); border: 1px solid var(--line); padding: 2px 8px; border-radius: var(--r-sm); font-family: var(--font-mono);">D</kbd><span>Dashboard</span>
+            <kbd style="background: var(--surface); border: 1px solid var(--line); padding: 2px 8px; border-radius: var(--r-sm); font-family: var(--font-mono);">1</kbd><span>Tareas</span>
+            <kbd style="background: var(--surface); border: 1px solid var(--line); padding: 2px 8px; border-radius: var(--r-sm); font-family: var(--font-mono);">2</kbd><span>Notas</span>
+            <kbd style="background: var(--surface); border: 1px solid var(--line); padding: 2px 8px; border-radius: var(--r-sm); font-family: var(--font-mono);">3</kbd><span>Metas</span>
+            <kbd style="background: var(--surface); border: 1px solid var(--line); padding: 2px 8px; border-radius: var(--r-sm); font-family: var(--font-mono);">T</kbd><span>Tema</span>
+            <kbd style="background: var(--surface); border: 1px solid var(--line); padding: 2px 8px; border-radius: var(--r-sm); font-family: var(--font-mono);">A</kbd><span>Nueva tarea</span>
+            <kbd style="background: var(--surface); border: 1px solid var(--line); padding: 2px 8px; border-radius: var(--r-sm); font-family: var(--font-mono);">N</kbd><span>Nueva nota</span>
+            <kbd style="background: var(--surface); border: 1px solid var(--line); padding: 2px 8px; border-radius: var(--r-sm); font-family: var(--font-mono);">G</kbd><span>Nueva meta</span>
+            <kbd style="background: var(--surface); border: 1px solid var(--line); padding: 2px 8px; border-radius: var(--r-sm); font-family: var(--font-mono);">?</kbd><span>Ayuda</span>
+            <hr style="grid-column: 1 / -1; margin: var(--s-4) 0; border-color: var(--line);">
+            <span style="font-weight: 600; color: var(--ink-2);">En editor:</span><span></span>
+            <kbd style="background: var(--surface); border: 1px solid var(--line); padding: 2px 8px; border-radius: var(--r-sm); font-family: var(--font-mono);">Ctrl+B</kbd><span>Negrita</span>
+            <kbd style="background: var(--surface); border: 1px solid var(--line); padding: 2px 8px; border-radius: var(--r-sm); font-family: var(--font-mono);">Ctrl+I</kbd><span>Cursiva</span>
+            <kbd style="background: var(--surface); border: 1px solid var(--line); padding: 2px 8px; border-radius: var(--r-sm); font-family: var(--font-mono);">Ctrl+K</kbd><span>Enlace</span>
+            <kbd style="background: var(--surface); border: 1px solid var(--line); padding: 2px 8px; border-radius: var(--r-sm); font-family: var(--font-mono);">Ctrl+S</kbd><span>Guardar</span>
+            <kbd style="background: var(--surface); border: 1px solid var(--line); padding: 2px 8px; border-radius: var(--r-sm); font-family: var(--font-mono);">Escape</kbd><span>Cerrar</span>
           </div>
         </div>
         <footer class="modal__footer"><button class="btn btn--primary" data-close>Entendido</button></footer>

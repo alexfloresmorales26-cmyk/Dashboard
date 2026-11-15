@@ -4,9 +4,7 @@
 
 import { TaskItem } from './TaskItem.js';
 import { TaskForm } from './TaskForm.js';
-import { formatRelativeDate, todayString } from '../../utils/date.js';
 import { db } from '../../store/index.js';
-import { ICONS } from '../Header/Header.js';
 
 const ICONS_EXTRA = {
   filter: '<svg class="icon icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>',
@@ -18,7 +16,6 @@ export function TaskList({
   showCompleted = false, 
   maxItems = null, 
   compact = false,
-  onAdd,
   onNavigate 
 }) {
   const container = document.createElement('div');
@@ -34,8 +31,8 @@ export function TaskList({
     if (maxItems) tasks = tasks.slice(0, maxItems);
     
     container.innerHTML = `
-      <div class="task-list__header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-md); flex-wrap: wrap; gap: var(--space-sm);">
-        <div class="task-list__filters" style="display: flex; gap: var(--space-sm); flex-wrap: wrap;">
+      <div class="task-list__header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--s-4); flex-wrap: wrap; gap: var(--s-2);">
+        <div class="task-list__filters" style="display: flex; gap: var(--s-2); flex-wrap: wrap;">
           <select class="form-select form-select--sm" data-filter="status" aria-label="Filtrar por estado" style="min-width: 120px;">
             <option value="all">Todas</option>
             <option value="active">Activas</option>
@@ -68,7 +65,7 @@ export function TaskList({
       </ul>
       
       ${maxItems && db.tasks.filter(filters).length > maxItems ? `
-        <div class="task-list__more" style="text-align: center; margin-top: var(--space-md);">
+        <div class="task-list__more" style="text-align: center; margin-top: var(--s-4);">
           <button class="btn btn--ghost btn--sm" data-view-all>Ver todas (${db.tasks.filter(filters).length}) →</button>
         </div>
       ` : ''}
@@ -92,7 +89,7 @@ export function TaskList({
       onDelete: (id) => db.tasks.remove(id),
       onDragStart: (task, el) => { draggedItem = el; },
       onDragEnd: () => { draggedItem = null; },
-      onDragOver: (e, targetTask) => {
+      onDragOver: (e, _targetTask) => {
         if (!draggedItem) return;
         const list = container.querySelector('[data-task-list]');
         const afterElement = getDragAfterElement(list, e.clientY);
@@ -101,16 +98,15 @@ export function TaskList({
         } else {
           list.insertBefore(draggedItem, afterElement);
         }
-      },
-      onDrop: (draggedId, targetId) => handleReorder(draggedId, targetId)
+      }
     });
   }
   
   function renderEmptyState() {
     return `
-      <li class="empty-state" style="padding: var(--space-lg); text-align: center; color: var(--color-fg-muted);">
+      <li class="empty-state" style="padding: var(--s-6); text-align: center; color: var(--ink-2);">
         ${filters.search ? 'Sin resultados' : (filters.status === 'completed' ? 'Sin tareas completadas' : 'Sin tareas pendientes')}
-        ${!filters.search && filters.status !== 'completed' ? `<br><button class="btn btn--primary btn--sm" data-add-task style="margin-top: var(--space-sm);">${ICONS_EXTRA.plus} Crear primera</button>` : ''}
+        ${!filters.search && filters.status !== 'completed' ? `<br><button class="btn btn--primary btn--sm" data-add-task style="margin-top: var(--s-2);">${ICONS_EXTRA.plus} Crear primera</button>` : ''}
       </li>
     `;
   }
@@ -163,7 +159,7 @@ export function TaskList({
       }
     });
     
-    list.addEventListener('dragend', (e) => {
+    list.addEventListener('dragend', () => {
       if (draggedItem) {
         draggedItem.classList.remove('task-item--dragging');
         draggedItem = null;
@@ -220,10 +216,6 @@ export function TaskList({
     }, { offset: Number.NEGATIVE_INFINITY }).element;
   }
   
-  function handleReorder(draggedId, targetId) {
-    // El reordenamiento se hace en el drop event
-  }
-  
   function openModal(task = null) {
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
@@ -232,6 +224,7 @@ export function TaskList({
     const form = TaskForm({
       task,
       onClose: () => {
+        form.destroy?.();
         overlay.remove();
       },
       onSubmit: (idOrData, data) => {
@@ -242,6 +235,7 @@ export function TaskList({
           // TaskForm pasa (data) al crear
           db.tasks.create(idOrData);
         }
+        form.destroy?.();
         overlay.remove();
       }
     });

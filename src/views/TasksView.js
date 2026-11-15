@@ -3,7 +3,6 @@
  */
 
 import { TaskList } from '../components/TaskList/TaskList.js';
-import { db } from '../store/index.js';
 import { ICONS } from '../components/Header/Header.js';
 
 const ICONS_EXTRA = {
@@ -16,6 +15,7 @@ export class TasksView {
     this.onNavigate = onNavigate;
     this.element = null;
     this.taskList = null;
+    this.unsubscribers = [];
   }
   
   render() {
@@ -25,17 +25,17 @@ export class TasksView {
     const stats = this.db.tasks.getStats();
     
     this.element.innerHTML = `
-      <header class="view__header" style="display: flex; align-items: center; justify-content: space-between; padding: var(--space-lg); border-bottom: 1px solid var(--color-border); flex-shrink: 0;">
+      <header class="view__header" style="display: flex; align-items: center; justify-content: space-between; padding: var(--s-6); border-bottom: 1px solid var(--line); flex-shrink: 0;">
         <div class="view__title-group">
-          <h1 class="view__title" style="display: flex; align-items: center; gap: var(--space-sm); margin: 0; font-size: var(--font-size-2xl);">${ICONS.list} Tareas</h1>
-          <span class="view__count" style="color: var(--color-fg-muted); font-size: var(--font-size-lg); font-weight: 400;">${stats.active} activas · ${stats.completed} completadas · ${stats.overdue} vencidas</span>
+          <h1 class="view__title" style="display: flex; align-items: center; gap: var(--s-2); margin: 0; font-size: var(--text-lg);">${ICONS.list} Tareas</h1>
+          <span class="view__count" style="color: var(--ink-2); font-size: var(--text-lg); font-weight: 400;" data-view-count>${stats.active} activas · ${stats.completed} completadas · ${stats.overdue} vencidas</span>
         </div>
-        <button class="btn btn--primary" data-action="add-task" style="display: flex; align-items: center; gap: var(--space-sm);">
+        <button class="btn btn--primary" data-action="add-task" style="display: flex; align-items: center; gap: var(--s-2);">
           ${ICONS_EXTRA.plus} Nueva tarea
         </button>
       </header>
       
-      <main class="view__content" style="flex: 1; overflow: auto; padding: var(--space-lg);" data-task-list-container></main>
+      <main class="view__content" style="flex: 1; overflow: auto; padding: var(--s-6);" data-task-list-container></main>
     `;
     
     // Inicializar TaskList completo
@@ -55,10 +55,26 @@ export class TasksView {
       this.taskList?.querySelector('[data-add-task]')?.dispatchEvent(event);
     });
     
+    // Mantener el contador del header en vivo
+    this.unsubscribers.push(
+      this.db.tasks.subscribe(() => this.updateHeaderStats())
+    );
+    
     return this.element;
   }
   
+  updateHeaderStats() {
+    if (!this.element) return;
+    const stats = this.db.tasks.getStats();
+    const count = this.element.querySelector('[data-view-count]');
+    if (count) {
+      count.textContent = `${stats.active} activas · ${stats.completed} completadas · ${stats.overdue} vencidas`;
+    }
+  }
+  
   destroy() {
+    this.unsubscribers.forEach(unsub => unsub());
+    this.unsubscribers = [];
     this.taskList?.destroy?.();
     this.element = null;
     this.taskList = null;
