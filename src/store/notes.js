@@ -84,13 +84,13 @@ export function notesStore(parentStore) {
     if (pinnedOnly) notes = notes.filter(n => n.isPinned);
     
     if (tags && tags.length > 0) {
-      notes = notes.filter(n => tags.some(tag => n.tags.includes(tag)));
+      notes = notes.filter(n => tags.some(tag => (n.tags || []).includes(tag)));
     }
     
     return notes.filter(note => 
       note.title.toLowerCase().includes(searchTerm) ||
       note.content.toLowerCase().includes(searchTerm) ||
-      note.tags.some(tag => tag.toLowerCase().includes(searchTerm))
+      (note.tags || []).some(tag => tag.toLowerCase().includes(searchTerm))
     );
   }
   
@@ -100,7 +100,8 @@ export function notesStore(parentStore) {
   function getAllTags() {
     const tags = new Set();
     getAll().forEach(note => {
-      note.tags.forEach(tag => tags.add(tag));
+      // Datos antiguos pueden no tener tags: no romper el render por eso
+      (Array.isArray(note.tags) ? note.tags : []).forEach(tag => tags.add(tag));
     });
     return Array.from(tags).sort();
   }
@@ -110,7 +111,7 @@ export function notesStore(parentStore) {
    */
   function filterByTag(tag) {
     if (!tag) return getAll();
-    return getAll().filter(note => note.tags.includes(tag));
+    return getAll().filter(note => (note.tags || []).includes(tag));
   }
   
   /**
@@ -141,7 +142,7 @@ export function notesStore(parentStore) {
     return create({
       title: `${note.title} (copia)`,
       content: note.content,
-      tags: [...note.tags]
+      tags: [...(note.tags || [])]
     });
   }
   

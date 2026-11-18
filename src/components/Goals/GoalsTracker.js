@@ -5,6 +5,7 @@
 import { GoalCard } from './GoalCard.js';
 import { GoalForm } from './GoalForm.js';
 import { db } from '../../store/index.js';
+import { escapeHtml } from '../../utils/html.js';
 
 const ICONS = {
   plus: '<svg class="icon icon--md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
@@ -66,6 +67,10 @@ export function GoalsTracker({ compact = false, maxItems = null, onNavigate }) {
       ${!compact && stats.total > 0 ? renderStatsSummary(stats) : ''}
     `;
     
+    // Mantener el filtro visual tras el re-render
+    const periodSelect = container.querySelector('[data-filter-period]');
+    if (periodSelect) periodSelect.value = filterPeriod;
+
     // Añadir las tarjetas como elementos reales (conserva listeners)
     const listEl = container.querySelector('[data-goals-list]');
     filteredGoals.forEach(goal => listEl?.appendChild(renderGoalCard(goal)));
@@ -257,12 +262,6 @@ export function GoalsTracker({ compact = false, maxItems = null, onNavigate }) {
   render();
   
   return container;
-}
-
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
 }
 
 export default GoalsTracker;

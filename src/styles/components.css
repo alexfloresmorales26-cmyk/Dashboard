@@ -670,6 +670,26 @@
   color: var(--accent);
 }
 
+.progress-ring {
+  display: block;
+  transform: rotate(-90deg); /* el progreso empieza arriba */
+}
+
+.progress-ring__bg {
+  fill: none;
+  stroke: var(--line);
+}
+
+.progress-ring__progress {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+}
+
+.progress-ring__progress--success {
+  stroke: var(--accent);
+}
+
 .goal-weekly-chart {
   display: grid;
   grid-template-columns: repeat(7, 1fr);

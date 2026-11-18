@@ -129,7 +129,7 @@ export class DashboardView {
       .sort((a, b) => (a.completed - b.completed) || (a.order - b.order));
 
     if (all.length === 0) {
-      el.innerHTML = `<p class="dash__empty">Nada pendiente para hoy.</p>`;
+      el.innerHTML = '<p class="dash__empty">Nada pendiente para hoy.</p>';
       return;
     }
 
@@ -167,7 +167,7 @@ export class DashboardView {
     }
 
     if (goals.length === 0) {
-      el.innerHTML = `<p class="dash__empty">Sin metas todavía.</p>`;
+      el.innerHTML = '<p class="dash__empty">Sin metas todavía.</p>';
       return;
     }
 
@@ -191,7 +191,7 @@ export class DashboardView {
       .slice(0, 3);
 
     if (notes.length === 0) {
-      el.innerHTML = `<p class="dash__empty">Sin notas todavía.</p>`;
+      el.innerHTML = '<p class="dash__empty">Sin notas todavía.</p>';
       return;
     }
 

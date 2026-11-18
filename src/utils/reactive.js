@@ -75,16 +75,11 @@ export function createStore(initialData = {}) {
   const listeners = new Map(); // key -> Set<callback>
   
   function notify(key) {
-    const keyListeners = listeners.get(key);
-    if (keyListeners) {
-      const value = key ? get(key) : state.get();
-      keyListeners.forEach(fn => fn(value));
-    }
-    // También notificar listeners globales (key = '')
-    const globalListeners = listeners.get('');
-    if (globalListeners) {
-      globalListeners.forEach(fn => fn(state.get()));
-    }
+    const value = key ? get(key) : state.get();
+    listeners.get(key)?.forEach(fn => fn(value));
+    // Los suscriptores globales ('') reciben cualquier cambio, pero no se
+    // duplican cuando la propia clave notificada es ''.
+    if (key) listeners.get('')?.forEach(fn => fn(state.get()));
   }
   
   function get(key) {
@@ -106,7 +101,6 @@ export function createStore(initialData = {}) {
     
     state.set(next);
     notify(key);
-    notify('');
   }
   
   function update(key, updater) {

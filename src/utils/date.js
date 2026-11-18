@@ -4,8 +4,23 @@
 
 const LOCALE = 'es-ES';
 
+/**
+ * Convierte a Date respetando la zona horaria local.
+ * Las fechas "solo día" (YYYY-MM-DD) se interpretan como locales; new Date(str)
+ * las interpretaría como medianoche UTC y en UTC-6 se convertirían en el día
+ * anterior.
+ */
+function toLocalDate(date) {
+  if (date instanceof Date) return new Date(date);
+  if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    const [y, m, d] = date.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  }
+  return new Date(date);
+}
+
 export function formatDate(date, options = {}) {
-  const d = date instanceof Date ? date : new Date(date);
+  const d = toLocalDate(date);
   if (isNaN(d.getTime())) return '';
   
   const defaultOptions = {
@@ -19,13 +34,13 @@ export function formatDate(date, options = {}) {
 }
 
 export function formatDateShort(date) {
-  const d = date instanceof Date ? date : new Date(date);
+  const d = toLocalDate(date);
   if (isNaN(d.getTime())) return '';
   return d.toLocaleDateString(LOCALE, { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
 export function formatRelativeDate(date) {
-  const d = date instanceof Date ? date : new Date(date);
+  const d = toLocalDate(date);
   if (isNaN(d.getTime())) return '';
   
   const today = new Date();
@@ -46,7 +61,7 @@ export function formatRelativeDate(date) {
 }
 
 export function formatTime(date, options = {}) {
-  const d = date instanceof Date ? date : new Date(date);
+  const d = toLocalDate(date);
   if (isNaN(d.getTime())) return '';
   
   return d.toLocaleTimeString(LOCALE, {
@@ -58,13 +73,13 @@ export function formatTime(date, options = {}) {
 }
 
 export function formatDateTime(date) {
-  const d = date instanceof Date ? date : new Date(date);
+  const d = toLocalDate(date);
   if (isNaN(d.getTime())) return '';
   return `${formatDate(d)}, ${formatTime(d)}`;
 }
 
 export function isToday(date) {
-  const d = date instanceof Date ? date : new Date(date);
+  const d = toLocalDate(date);
   if (isNaN(d.getTime())) return false;
   
   const today = new Date();
@@ -74,7 +89,7 @@ export function isToday(date) {
 }
 
 export function isPast(date) {
-  const d = date instanceof Date ? date : new Date(date);
+  const d = toLocalDate(date);
   if (isNaN(d.getTime())) return false;
   
   const today = new Date();
@@ -86,7 +101,7 @@ export function isPast(date) {
 }
 
 export function isFuture(date) {
-  const d = date instanceof Date ? date : new Date(date);
+  const d = toLocalDate(date);
   if (isNaN(d.getTime())) return false;
   
   const today = new Date();
@@ -98,33 +113,36 @@ export function isFuture(date) {
 }
 
 export function startOfDay(date) {
-  const d = date instanceof Date ? new Date(date) : new Date();
+  const d = date === undefined ? new Date() : toLocalDate(date);
   d.setHours(0, 0, 0, 0);
   return d;
 }
 
 export function endOfDay(date) {
-  const d = date instanceof Date ? new Date(date) : new Date();
+  const d = date === undefined ? new Date() : toLocalDate(date);
   d.setHours(23, 59, 59, 999);
   return d;
 }
 
 export function addDays(date, days) {
-  const d = date instanceof Date ? new Date(date) : new Date();
+  const d = date === undefined ? new Date() : toLocalDate(date);
   d.setDate(d.getDate() + days);
   return d;
 }
 
 export function diffDays(date1, date2) {
-  const d1 = startOfDay(date1 instanceof Date ? date1 : new Date(date1));
-  const d2 = startOfDay(date2 instanceof Date ? date2 : new Date(date2));
+  const d1 = startOfDay(date1);
+  const d2 = startOfDay(date2);
   return Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
 }
 
 export function toDateInputValue(date) {
-  const d = date instanceof Date ? date : new Date(date);
+  const d = toLocalDate(date);
   if (isNaN(d.getTime())) return '';
-  return d.toISOString().split('T')[0];
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 export function fromDateInputValue(value) {
@@ -134,13 +152,13 @@ export function fromDateInputValue(value) {
 }
 
 export function getDayName(date, short = false) {
-  const d = date instanceof Date ? date : new Date(date);
+  const d = toLocalDate(date);
   if (isNaN(d.getTime())) return '';
   return d.toLocaleDateString(LOCALE, { weekday: short ? 'short' : 'long' });
 }
 
 export function getMonthName(date, short = false) {
-  const d = date instanceof Date ? date : new Date(date);
+  const d = toLocalDate(date);
   if (isNaN(d.getTime())) return '';
   return d.toLocaleDateString(LOCALE, { month: short ? 'short' : 'long' });
 }

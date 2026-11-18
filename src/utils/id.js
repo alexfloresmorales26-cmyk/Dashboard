@@ -15,16 +15,20 @@ let customDefaultSize = 21;
  * @returns {string}
  */
 export function nanoid(size = customDefaultSize, alphabet = customAlphabet) {
-  let id = '';
-  const bytes = crypto.getRandomValues(new Uint8Array(size));
+  if (!alphabet || alphabet.length < 2) {
+    throw new Error('nanoid: el alfabeto debe tener al menos 2 caracteres');
+  }
+
   const mask = (2 << Math.log2(alphabet.length - 1)) - 1;
-  
-  for (let i = 0; i < size; i++) {
-    const byte = bytes[i] & mask;
-    if (byte < alphabet.length) {
-      id += alphabet[byte];
-    } else {
-      i--; // Reintentar este byte
+  let id = '';
+
+  // Se piden bytes nuevos por lote. Reintentar el mismo byte rechazado con
+  // i-- provocaba un bucle infinito con alfabetos que no son potencia de 2.
+  while (id.length < size) {
+    const bytes = crypto.getRandomValues(new Uint8Array(size * 2));
+    for (let i = 0; i < bytes.length && id.length < size; i++) {
+      const byte = bytes[i] & mask;
+      if (byte < alphabet.length) id += alphabet[byte];
     }
   }
   return id;

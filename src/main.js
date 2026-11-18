@@ -73,6 +73,12 @@ async function navigate() {
     updateActiveIndicators(route);
   }
 
+  // Los modales viven en document.body, fuera de la vista: cerrarlos antes de
+  // cambiar de ruta (su handler de Escape los destruye y elimina)
+  if (document.querySelector('body > .modal-overlay')) {
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+  }
+
   // Limpiar vista anterior
   if (currentViewInstance && typeof currentViewInstance.destroy === 'function') {
     currentViewInstance.destroy();
@@ -235,6 +241,9 @@ window.addEventListener('app:add-note', () => {
     currentViewInstance.createNote?.();
   } else {
     goTo('notes');
+    setTimeout(() => {
+      if (currentView === 'notes') currentViewInstance?.createNote?.();
+    }, 100);
   }
 });
 
@@ -243,6 +252,9 @@ window.addEventListener('app:add-goal', () => {
     currentViewInstance.openGoalModal?.();
   } else {
     goTo('goals');
+    setTimeout(() => {
+      if (currentView === 'goals') currentViewInstance?.openGoalModal?.();
+    }, 100);
   }
 });
 
@@ -257,8 +269,23 @@ window.addEventListener('app:search-notes', (e) => {
 // INICIALIZACIÓN
 // ============================================
 
+function handleLaunchAction() {
+  const action = new URLSearchParams(window.location.search).get('action');
+  if (!action) return;
+
+  // Limpiar la query para que recargar no repita la acción
+  history.replaceState(null, '', window.location.pathname + window.location.hash);
+
+  window.setTimeout(() => {
+    if (action === 'new-task') window.dispatchEvent(new CustomEvent('app:add-task'));
+    else if (action === 'new-note') window.dispatchEvent(new CustomEvent('app:add-note'));
+    else if (action === 'new-goal') window.dispatchEvent(new CustomEvent('app:add-goal'));
+  }, 0);
+}
+
 async function init() {
   await navigate();
+  handleLaunchAction();
 
   // Service Worker: solo en producción. En desarrollo el SW cachea los CSS
   // que Vite sirve como módulos JS (respuesta no parseable como text/css)

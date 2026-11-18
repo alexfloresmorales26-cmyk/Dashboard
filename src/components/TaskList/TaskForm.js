@@ -4,6 +4,7 @@
 
 import { toDateInputValue } from '../../utils/date.js';
 import { db } from '../../store/index.js';
+import { escapeAttr, escapeHtml } from '../../utils/html.js';
 
 const ICONS = {
   close: '<svg class="icon icon--md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
@@ -15,15 +16,9 @@ export function TaskForm({ task = null, onClose, onSubmit }) {
   const isEditing = !!task;
   const form = document.createElement('form');
   form.className = 'modal';
-  const escapeHtml = (text) => {
-    const div = document.createElement('div');
-    div.textContent = text ?? '';
-    return div.innerHTML;
-  };
-
-  const titleValue = escapeHtml(task?.title || '');
+  const titleValue = escapeAttr(task?.title || '');
   const descValue = escapeHtml(task?.description || '');
-  const categoryValue = escapeHtml(task?.category || '');
+  const categoryValue = escapeAttr(task?.category || '');
 
   form.innerHTML = `
     <header class="modal__header">
@@ -71,7 +66,7 @@ export function TaskForm({ task = null, onClose, onSubmit }) {
                  placeholder="Ej: trabajo, personal, estudio..." 
                  value="${categoryValue}" list="categories" style="flex: 1; min-width: 150px;">
           <datalist id="categories">
-            ${db.tasks.getCategories().map(c => `<option value="${escapeHtml(c)}">`).join('')}
+            ${db.tasks.getCategories().map(c => `<option value="${escapeAttr(c)}">`).join('')}
           </datalist>
         </div>
       </div>

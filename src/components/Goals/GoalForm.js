@@ -2,6 +2,8 @@
  * GoalForm - Formulario modal para crear/editar metas
  */
 
+import { escapeAttr } from '../../utils/html.js';
+
 const ICONS = {
   close: '<svg class="icon icon--md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
 };
@@ -35,7 +37,7 @@ export function GoalForm({ goal = null, onClose, onSubmit }) {
         <label class="form-label" for="goal-title">Título *</label>
         <input type="text" class="form-input" id="goal-title" name="title" required 
                placeholder="Ej: Beber agua, Leer, Ejercicio, Meditar" 
-               value="${escapeHtml(initialTitle)}" autocomplete="off">
+               value="${escapeAttr(initialTitle)}" autocomplete="off">
       </div>
       
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4);">
@@ -50,7 +52,7 @@ export function GoalForm({ goal = null, onClose, onSubmit }) {
           <div style="position: relative;">
             <input type="text" class="form-input" id="goal-unit" name="unit" 
                    placeholder="veces, minutos, litros..." 
-                   value="${escapeHtml(initialUnit)}" required list="unit-suggestions" autocomplete="off">
+                   value="${escapeAttr(initialUnit)}" required list="unit-suggestions" autocomplete="off">
             <datalist id="unit-suggestions">
               ${UNIT_SUGGESTIONS.map(u => `<option value="${u}">`).join('')}
             </datalist>
@@ -138,12 +140,6 @@ export function GoalForm({ goal = null, onClose, onSubmit }) {
   };
   
   return form;
-}
-
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
 }
 
 export default GoalForm;

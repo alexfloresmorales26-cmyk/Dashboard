@@ -5,6 +5,7 @@
  */
 
 import { renderMarkdownSync, preload, isReady } from '../../utils/markdown.js';
+import { escapeHtml, escapeAttr } from '../../utils/html.js';
 
 const ICONS = {
   bold: '<strong style="font-size: 14px;">B</strong>',
@@ -40,6 +41,8 @@ export function NoteEditor({ note, onSave, onClose, onDelete, onDuplicate }) {
   editor.style.maxWidth = '900px';
   
   let saveTimeout = null;
+  let statusTimeout = null;
+  let pendingSave = false;
   let isFullscreen = false;
   let showPreview = true;
   
@@ -74,13 +77,13 @@ export function NoteEditor({ note, onSave, onClose, onDelete, onDuplicate }) {
           <div style="display: flex; gap: var(--s-4); align-items: flex-start;">
             <input type="text" class="form-input" id="note-title" name="title" 
                    placeholder="Título de la nota..." 
-                   value="${escapeHtml(initialTitle)}"
+                   value="${escapeAttr(initialTitle)}"
                    style="flex: 1; font-size: var(--text-lg); font-weight: 600; border: none; background: transparent; box-shadow: none; padding: 0;"
                    autocomplete="off">
             <div style="display: flex; gap: var(--s-2); flex-shrink: 0;">
               <input type="text" class="form-input form-input--sm" id="note-tags" name="tags" 
                      placeholder="Tags (coma separados)" 
-                     value="${escapeHtml(initialTags)}"
+                     value="${escapeAttr(initialTags)}"
                      style="width: 200px;">
             </div>
           </div>
@@ -155,7 +158,7 @@ export function NoteEditor({ note, onSave, onClose, onDelete, onDuplicate }) {
       <footer class="modal__footer" style="display: flex; justify-content: flex-end; gap: var(--s-2); padding: var(--s-4) var(--s-6); border-top: 1px solid var(--line); flex-shrink: 0; background: var(--surface-2);">
         <button type="button" class="btn btn--ghost btn--sm" data-duplicate>${ICONS.duplicate} Duplicar</button>
         <button type="button" class="btn btn--danger btn--sm" data-delete>${ICONS.delete} Eliminar</button>
-        <button type="button" class="btn btn--secondary btn--sm" data-close>Cancelar</button>
+        <button type="button" class="btn btn--secondary btn--sm" data-close>Guardar y cerrar</button>
         <button type="submit" class="btn btn--primary btn--sm" id="save-btn">${ICONS.save} Guardar (Ctrl+S)</button>
       </footer>
     </form>
@@ -197,8 +200,8 @@ export function NoteEditor({ note, onSave, onClose, onDelete, onDuplicate }) {
   function showSavedStatus() {
     saveStatus.textContent = 'Guardado ✓';
     saveStatus.style.color = 'var(--accent)';
-    clearTimeout(saveTimeout);
-    saveTimeout = setTimeout(() => {
+    clearTimeout(statusTimeout);
+    statusTimeout = setTimeout(() => {
       saveStatus.textContent = 'Guardado';
       saveStatus.style.color = '';
     }, 1500);
@@ -225,6 +228,25 @@ export function NoteEditor({ note, onSave, onClose, onDelete, onDuplicate }) {
     showSavedStatus();
   }
   
+  function scheduleSave() {
+    pendingSave = true;
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+      if (isNew) return;
+      pendingSave = false;
+      saveNote();
+    }, 1000);
+  }
+  
+  // Vuelca el guardado pendiente. Se llama al cerrar, al navegar y al destruir
+  // el editor: el debounce de 1 s no debe perder lo último escrito.
+  function flushSave() {
+    if (!pendingSave) return;
+    clearTimeout(saveTimeout);
+    pendingSave = false;
+    if (!isNew) saveNote();
+  }
+  
   // ============================================
   // EVENT LISTENERS
   // ============================================
@@ -233,33 +255,25 @@ export function NoteEditor({ note, onSave, onClose, onDelete, onDuplicate }) {
   textarea.addEventListener('input', () => {
     updateCharCount();
     updatePreview();
-    clearTimeout(saveTimeout);
-    saveTimeout = setTimeout(() => {
-      if (!isNew) saveNote();
-    }, 1000);
+    scheduleSave();
   });
   
-  titleInput.addEventListener('input', () => {
-    clearTimeout(saveTimeout);
-    saveTimeout = setTimeout(() => {
-      if (!isNew) saveNote();
-    }, 1000);
-  });
-  
-  tagsInput.addEventListener('input', () => {
-    clearTimeout(saveTimeout);
-    saveTimeout = setTimeout(() => {
-      if (!isNew) saveNote();
-    }, 1000);
-  });
+  titleInput.addEventListener('input', scheduleSave);
+  tagsInput.addEventListener('input', scheduleSave);
   
   pinToggle.addEventListener('change', () => {
-    if (!isNew) saveNote();
+    if (!isNew) {
+      clearTimeout(saveTimeout);
+      pendingSave = false;
+      saveNote();
+    }
   });
   
   // Submit form
   form.addEventListener('submit', (e) => {
     e.preventDefault();
+    clearTimeout(saveTimeout);
+    pendingSave = false;
     saveNote();
   });
   
@@ -346,6 +360,7 @@ export function NoteEditor({ note, onSave, onClose, onDelete, onDuplicate }) {
   editor.querySelectorAll('[data-close]').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
+      flushSave();
       onClose();
     });
   });
@@ -366,6 +381,8 @@ export function NoteEditor({ note, onSave, onClose, onDelete, onDuplicate }) {
   const handleKeydown = (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 's') {
       e.preventDefault();
+      clearTimeout(saveTimeout);
+      pendingSave = false;
       saveNote();
     }
     if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
@@ -381,6 +398,8 @@ export function NoteEditor({ note, onSave, onClose, onDelete, onDuplicate }) {
       insertLink(textarea);
     }
     if (e.key === 'Escape') {
+      e.preventDefault();
+      flushSave();
       onClose();
     }
     if (e.key === 'F11' || (e.ctrlKey && e.key === 'f')) {
@@ -393,10 +412,11 @@ export function NoteEditor({ note, onSave, onClose, onDelete, onDuplicate }) {
   
   // Cleanup
   editor.destroy = () => {
+    flushSave();
+    clearTimeout(statusTimeout);
     document.removeEventListener('keydown', handleKeydown);
     document.removeEventListener('mousemove', handleMouseMove);
     document.removeEventListener('mouseup', handleMouseUp);
-    clearTimeout(saveTimeout);
     document.body.style.overflow = '';
   };
   
@@ -415,12 +435,6 @@ export function NoteEditor({ note, onSave, onClose, onDelete, onDuplicate }) {
   }
   
   return editor;
-}
-
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
 }
 
 function wrapSelection(textarea, prefix, suffix) {

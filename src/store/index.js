@@ -24,6 +24,36 @@ const defaultState = {
   version: STORAGE_VERSION
 };
 
+
+// ============================================
+// VALIDADORES (importación y recuperación)
+// ============================================
+const isObj = v => v !== null && typeof v === 'object' && !Array.isArray(v);
+const isStr = v => typeof v === 'string';
+const isNum = v => typeof v === 'number' && Number.isFinite(v);
+const isISO = v => isStr(v) && !Number.isNaN(Date.parse(v));
+const isDay = v => isStr(v) && /^\d{4}-\d{2}-\d{2}$/.test(v);
+
+const isValidTask = t =>
+  isObj(t) && isStr(t.id) && t.id.length > 0 && isStr(t.title) &&
+  isStr(t.description) && typeof t.completed === 'boolean' &&
+  ['low', 'med', 'high'].includes(t.priority) &&
+  (t.dueDate === null || isDay(t.dueDate)) &&
+  isStr(t.category) && isNum(t.order) && isISO(t.createdAt) && isISO(t.updatedAt);
+
+const isValidNote = n =>
+  isObj(n) && isStr(n.id) && n.id.length > 0 && isStr(n.title) &&
+  isStr(n.content) && Array.isArray(n.tags) && n.tags.every(isStr) &&
+  typeof n.isPinned === 'boolean' && isISO(n.createdAt) && isISO(n.updatedAt);
+
+const isValidGoal = g =>
+  isObj(g) && isStr(g.id) && g.id.length > 0 && isStr(g.title) &&
+  isNum(g.target) && isNum(g.current) && isStr(g.unit) &&
+  ['daily', 'weekly'].includes(g.period) && isNum(g.streak) &&
+  (g.lastCompleted === null || isDay(g.lastCompleted)) &&
+  Array.isArray(g.completedDates) && g.completedDates.every(isDay) &&
+  isISO(g.createdAt) && isISO(g.updatedAt);
+
 /**
  * Carga datos desde localStorage
  */
@@ -34,10 +64,10 @@ function loadFromStorage() {
     
     const parsed = JSON.parse(stored);
     
-    // Migración de versión si necesario
+    // Versión distinta: no borrar los datos del usuario. Se validan y se
+    // conservan los registros que tengan la forma esperada.
     if (parsed.version !== STORAGE_VERSION) {
-      console.warn('[Store] Versión de datos antigua, reiniciando...');
-      return defaultState;
+      console.warn(`[Store] Versión ${parsed.version} distinta de ${STORAGE_VERSION}; se conservan los datos validados`);
     }
     
     // Validar estructura básica.
@@ -52,9 +82,9 @@ function loadFromStorage() {
     const worldMigrated = Boolean(parsed.worldMigrated);
     if (!worldMigrated) theme = 'light';
     return {
-      tasks: Array.isArray(parsed.tasks) ? parsed.tasks : [],
-      notes: Array.isArray(parsed.notes) ? parsed.notes : [],
-      goals: Array.isArray(parsed.goals) ? parsed.goals : [],
+      tasks: Array.isArray(parsed.tasks) ? parsed.tasks.filter(isValidTask) : [],
+      notes: Array.isArray(parsed.notes) ? parsed.notes.filter(isValidNote) : [],
+      goals: Array.isArray(parsed.goals) ? parsed.goals.filter(isValidGoal) : [],
       theme,
       themeMigrated: true,
       worldMigrated,
@@ -148,10 +178,33 @@ export const db = {
   importData(jsonString) {
     try {
       const data = JSON.parse(jsonString);
-      // Validar tipos: importar basura corrompería el estado y crashearía el render
-      if (Array.isArray(data.tasks)) store.set('tasks', data.tasks);
-      if (Array.isArray(data.notes)) store.set('notes', data.notes);
-      if (Array.isArray(data.goals)) store.set('goals', data.goals);
+
+      const collections = [
+        ['tasks', isValidTask],
+        ['notes', isValidNote],
+        ['goals', isValidGoal]
+      ];
+      const present = collections.filter(([key]) => data[key] !== undefined);
+
+      if (present.length === 0) return false;
+
+      // Rechazo atómico: si un solo registro es inválido, no se toca el estado.
+      for (const [key, isValid] of present) {
+        if (!Array.isArray(data[key]) || !data[key].every(isValid)) return false;
+      }
+
+      const mergeById = (current, incoming) => {
+        const byId = new Map(current.map(item => [item.id, item]));
+        for (const item of incoming) {
+          byId.set(item.id, { ...(byId.get(item.id) || {}), ...item });
+        }
+        return [...byId.values()];
+      };
+
+      for (const [key] of present) {
+        store.set(key, mergeById(store.get(key) || [], data[key]));
+      }
+
       return true;
     } catch (e) {
       console.error('[Store] Error importando:', e);

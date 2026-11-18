@@ -6,6 +6,7 @@
 import { ICONS } from '../components/Header/Header.js';
 import { NoteEditor } from '../components/Notes/NoteEditor.js';
 import { NoteCard } from '../components/Notes/NoteCard.js';
+import { escapeHtml, escapeAttr } from '../utils/html.js';
 
 const ICONS_EXTRA = {
   plus: '<svg class="icon icon--md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
@@ -25,12 +26,14 @@ export class NotesView {
     this.unsubscribers = [];
     this.element = null;
     this.editorInstance = null;
+    this.tagsSignature = '';
   }
   
   render() {
     this.element = document.createElement('section');
     this.element.className = 'view notes-view';
     this.element.innerHTML = this.renderTemplate();
+    this.tagsSignature = this.db.notes.getAllTags().join('\u0000');
     
     // Llenar la lista de notas con elementos reales (conserva listeners)
     const listContainer = this.element.querySelector('[data-notes-list]');
@@ -51,7 +54,7 @@ export class NotesView {
       <header class="view__header" style="display: flex; align-items: center; justify-content: space-between; padding: var(--s-6); border-bottom: 1px solid var(--line); flex-shrink: 0; flex-wrap: wrap; gap: var(--s-4);">
         <div class="view__title-group">
           <h1 class="view__title" style="display: flex; align-items: center; gap: var(--s-2); margin: 0; font-size: var(--text-lg);">${ICONS.fileText} Notas</h1>
-          <span class="view__count" style="color: var(--ink-2); font-size: var(--text-lg); font-weight: 400;">${stats.total} notas · ${stats.pinned} fijadas</span>
+          <span class="view__count" data-view-count style="color: var(--ink-2); font-size: var(--text-lg); font-weight: 400;">${stats.total} notas · ${stats.pinned} fijadas</span>
         </div>
         <button class="btn btn--primary" data-action="add-note" style="display: flex; align-items: center; gap: var(--s-2);">
           ${ICONS_EXTRA.plus} Nueva nota
@@ -63,7 +66,7 @@ export class NotesView {
         <div class="toolbar__search" style="flex: 1; min-width: 250px; position: relative;">
           <label class="search-input-wrapper" style="width: 100%;">
             ${ICONS_EXTRA.filter}
-            <input type="search" class="form-input" placeholder="Buscar en notas..." data-search aria-label="Buscar notas" value="${escapeHtml(this.searchQuery)}" style="width: 100%;">
+            <input type="search" class="form-input" placeholder="Buscar en notas..." data-search aria-label="Buscar notas" value="${escapeAttr(this.searchQuery)}" style="width: 100%;">
           </label>
         </div>
         
@@ -130,7 +133,7 @@ export class NotesView {
         <div class="empty-state__icon">${ICONS.fileText}</div>
         <h3 class="empty-state__title" style="margin: var(--s-2) 0;">${this.searchQuery || this.activeTag ? 'Sin resultados' : 'Sin notas'}</h3>
         <p class="empty-state__description" style="font-size: var(--text-sm); max-width: 280px;">
-          ${this.searchQuery ? 'No se encontraron notas con ese término' : this.activeTag ? `Sin notas con tag "${this.activeTag}"` : 'Crea tu primera nota en Markdown'}
+          ${this.searchQuery ? 'No se encontraron notas con ese término' : this.activeTag ? `Sin notas con tag "${escapeHtml(this.activeTag)}"` : 'Crea tu primera nota en Markdown'}
         </p>
         <button class="btn btn--primary empty-state__action" data-action="add-note" style="margin-top: var(--s-4);">${ICONS_EXTRA.plus} Nueva nota</button>
       </div>
@@ -216,8 +219,8 @@ export class NotesView {
         ${ICONS.pin || '📌'} Fijadas
       </button>
       ${visibleTags.map(tag => `
-        <button class="btn btn--ghost btn--sm ${this.activeTag === tag ? 'btn--primary' : ''}" data-filter-tag="${tag}">
-          ${ICONS_EXTRA.tag || '#'} ${tag}
+        <button class="btn btn--ghost btn--sm ${this.activeTag === tag ? 'btn--primary' : ''}" data-filter-tag="${escapeAttr(tag)}">
+          ${ICONS_EXTRA.tag || '#'} ${escapeHtml(tag)}
         </button>
       `).join('')}
       ${allTags.length > 5 ? `
@@ -229,6 +232,12 @@ export class NotesView {
     `;
   }
   
+  updateStats() {
+    const stats = this.db.notes.getStats();
+    const count = this.element?.querySelector('[data-view-count]');
+    if (count) count.textContent = `${stats.total} notas · ${stats.pinned} fijadas`;
+  }
+
   refreshToolbar() {
     const toolbar = this.element.querySelector('.toolbar__filters');
     if (toolbar) {
@@ -303,12 +312,14 @@ export class NotesView {
       note,
       onSave: (data) => this.db.notes.update(note.id, data),
       onClose: () => {
+        this.editorInstance?.destroy?.();
         this.selectedNoteId = null;
         this.editorInstance = null;
         container.innerHTML = this.renderWelcome();
         this.refreshList(); // Actualizar lista por si cambió título
       },
       onDelete: () => {
+        this.editorInstance?.destroy?.();
         this.db.notes.remove(note.id);
         this.selectedNoteId = null;
         this.editorInstance = null;
@@ -329,8 +340,18 @@ export class NotesView {
     this.unsubscribers.push(
       this.db.notes.subscribe(() => {
         this.refreshList();
+        this.updateStats();
+
+        // El toolbar de tags solo se reconstruye si cambió el conjunto
+        const tagsSignature = this.db.notes.getAllTags().join('\u0000');
+        if (tagsSignature !== this.tagsSignature) {
+          this.tagsSignature = tagsSignature;
+          this.refreshToolbar();
+        }
+
         // Si la nota seleccionada fue eliminada, limpiar selección
         if (this.selectedNoteId && !this.db.notes.getById(this.selectedNoteId)) {
+          this.editorInstance?.destroy?.();
           this.selectedNoteId = null;
           this.editorInstance = null;
           const container = this.element?.querySelector('[data-editor-container]');
@@ -344,12 +365,6 @@ export class NotesView {
     this.unsubscribers.forEach(unsub => unsub());
     this.editorInstance?.destroy?.();
   }
-}
-
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
 }
 
 export default NotesView;

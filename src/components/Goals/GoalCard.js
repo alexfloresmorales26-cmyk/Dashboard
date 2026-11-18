@@ -2,6 +2,9 @@
  * GoalCard - Tarjeta de meta con anillo SVG progreso, streak, increment/decrement
  */
 
+import { toDateInputValue } from '../../utils/date.js';
+import { escapeHtml } from '../../utils/html.js';
+
 const ICONS_EXTRA = {
   fire: '<svg class="icon icon--xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2.01-1-3A2.5 2.5 0 0 1 13.5 5c0 1.38.5 2.01 1 3a2.5 2.5 0 0 0-5 0"/><path d="M15 12a2.5 2.5 0 0 0 2.5-2.5c0-1.38-.5-2.01-1-3A2.5 2.5 0 0 0 13.5 5c0 1.38.5 2.01 1 3a2.5 2.5 0 0 1 5 0"/></svg>',
   plus: '<svg class="icon icon--md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
@@ -38,7 +41,7 @@ export function GoalCard({ goal, onIncrement, onDecrement, onEdit, onReset, onDe
   for (let i = 6; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
-    last7.push(d.toISOString().split('T')[0]);
+    last7.push(toDateInputValue(d));
   }
   const weeklyCompleted = last7.filter(dateStr => history.includes(dateStr)).length;
   
@@ -83,7 +86,7 @@ export function GoalCard({ goal, onIncrement, onDecrement, onEdit, onReset, onDe
           </svg>
           <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
             <span style="font-weight: 700; font-size: var(--text-lg); color: var(--ink);">${progress}%</span>
-            <span style="font-size: var(--text-sm); color: var(--ink-2);">${goal.current}/${goal.target} ${goal.unit}</span>
+            <span style="font-size: var(--text-sm); color: var(--ink-2);">${goal.current}/${goal.target} ${escapeHtml(goal.unit)}</span>
           </div>
         </div>
         
@@ -139,7 +142,7 @@ export function GoalCard({ goal, onIncrement, onDecrement, onEdit, onReset, onDe
             ${escapeHtml(goal.title)}
           </h4>
           <div style="font-size: var(--text-xs); color: var(--ink-2); display: flex; align-items: center; gap: var(--s-1);">
-            <span>${goal.current}/${goal.target} ${goal.unit}</span>
+            <span>${goal.current}/${goal.target} ${escapeHtml(goal.unit)}</span>
             ${goal.streak > 0 ? `<span class="badge badge--warning" style="font-size: 10px;">${ICONS_EXTRA.fire} ${goal.streak}</span>` : ''}
           </div>
         </div>
@@ -221,12 +224,6 @@ function renderWeeklyBars(last7, completedDates = []) {
       </div>
     `;
   }).join('');
-}
-
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
 }
 
 export default GoalCard;

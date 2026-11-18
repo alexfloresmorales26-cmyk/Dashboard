@@ -16,6 +16,7 @@ export class GoalsView {
     this.onNavigate = onNavigate;
     this.element = null;
     this.tracker = null;
+    this.unsubscribers = [];
   }
   
   render() {
@@ -31,7 +32,7 @@ export class GoalsView {
       <header class="view__header" style="display: flex; align-items: center; justify-content: space-between; padding: var(--s-6); border-bottom: 1px solid var(--line); flex-shrink: 0; flex-wrap: wrap; gap: var(--s-4);">
         <div class="view__title-group">
           <h1 class="view__title" style="display: flex; align-items: center; gap: var(--s-2); margin: 0; font-size: var(--text-lg);">${ICONS.target} Metas diarias</h1>
-          <span class="view__count" style="color: var(--ink-2); font-size: var(--text-lg); font-weight: 400;">${stats.completedToday}/${stats.daily} completadas · Racha total: ${stats.totalStreak} días</span>
+          <span class="view__count" data-view-count style="color: var(--ink-2); font-size: var(--text-lg); font-weight: 400;">${stats.completedToday}/${stats.daily} completadas · Racha total: ${stats.totalStreak} días</span>
         </div>
         <button class="btn btn--primary" data-action="add-goal" style="display: flex; align-items: center; gap: var(--s-2);">
           ${ICONS_EXTRA.plus} Nueva meta
@@ -50,6 +51,11 @@ export class GoalsView {
     });
     container.appendChild(this.tracker);
     
+    // Mantener el contador del header en vivo
+    this.unsubscribers.push(
+      this.db.goals.subscribe(() => this.updateStats())
+    );
+    
     // Botón nueva meta en header
     this.element.querySelector('[data-action="add-goal"]')?.addEventListener('click', () => {
       this.tracker.querySelector('[data-add-goal]')?.click();
@@ -63,7 +69,18 @@ export class GoalsView {
     this.tracker?.openModal?.();
   }
   
+  updateStats() {
+    if (!this.element) return;
+    const stats = this.db.goals.getStats();
+    const count = this.element.querySelector('[data-view-count]');
+    if (count) {
+      count.textContent = `${stats.completedToday}/${stats.daily} completadas · Racha total: ${stats.totalStreak} días`;
+    }
+  }
+  
   destroy() {
+    this.unsubscribers.forEach(unsub => unsub());
+    this.unsubscribers = [];
     this.tracker?.destroy?.();
     this.element = null;
     this.tracker = null;

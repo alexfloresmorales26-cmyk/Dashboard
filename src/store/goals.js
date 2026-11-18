@@ -3,7 +3,7 @@
  */
 
 import { nanoid } from '../utils/id.js';
-import { nowISO, todayString } from '../utils/date.js';
+import { nowISO, todayString, toDateInputValue } from '../utils/date.js';
 
 export function goalsStore(parentStore) {
   const KEY = 'goals';
@@ -26,6 +26,7 @@ export function goalsStore(parentStore) {
       streak: 0, // Días consecutivos completados
       lastCompleted: null, // YYYY-MM-DD del último completado
       completedDates: [], // Historial de fechas completadas (YYYY-MM-DD)
+      lastReset: todayString(), // Día en que se reseteó el progreso por última vez
       createdAt: now,
       updatedAt: now
     };
@@ -123,7 +124,7 @@ export function goalsStore(parentStore) {
     if (goal.lastCompleted) {
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
-      const yesterdayStr = yesterday.toISOString().split('T')[0];
+      const yesterdayStr = toDateInputValue(yesterday);
       
       if (goal.lastCompleted === yesterdayStr) {
         newStreak = goal.streak + 1;
@@ -134,6 +135,7 @@ export function goalsStore(parentStore) {
     
     update(id, {
       lastCompleted: today,
+      lastReset: today,
       completedDates: newCompletedDates,
       streak: newStreak
     });
@@ -153,6 +155,13 @@ export function goalsStore(parentStore) {
       
       // Si ya se reseteó hoy, no hacer nada
       if (goal.lastReset === today) return goal;
+      
+      // Si ya se completó hoy (por ejemplo, datos importados sin lastReset),
+      // no borrar el progreso: solo marcar el día como reseteado.
+      if (goal.lastCompleted === today) {
+        changed = true;
+        return { ...goal, lastReset: today, updatedAt: nowISO() };
+      }
       
       changed = true;
       return {
@@ -202,7 +211,7 @@ export function goalsStore(parentStore) {
     for (let i = days - 1; i >= 0; i--) {
       const date = new Date(today);
       date.setDate(date.getDate() - i);
-      const dateStr = date.toISOString().split('T')[0];
+      const dateStr = toDateInputValue(date);
       
       history.push({
         date: dateStr,
@@ -225,7 +234,7 @@ export function goalsStore(parentStore) {
       total: goals.length,
       daily: goals.filter(g => g.period === 'daily').length,
       weekly: goals.filter(g => g.period === 'weekly').length,
-      completedToday: todayGoals.filter(g => g.isCompleted).length,
+      completedToday: todayGoals.filter(g => g.isCompleted && g.period === 'daily').length,
       activeToday: todayGoals.filter(g => !g.isCompleted && g.period === 'daily').length,
       totalStreak: goals.reduce((sum, g) => sum + g.streak, 0),
       bestStreak: Math.max(...goals.map(g => g.streak), 0)

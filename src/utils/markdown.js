@@ -107,10 +107,10 @@ export function extractPlainText(markdown) {
   if (!markdown) return '';
   
   return markdown
-    .replace(/[#*`_~\[\]()]/g, '') // Quitar sintaxis MD básica
-    .replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1') // Links/imágenes -> texto
-    .replace(/```[\s\S]*?```/g, '') // Bloques código
+    .replace(/```[\s\S]*?```/g, ' ') // Bloques de código
     .replace(/`([^`]+)`/g, '$1') // Código inline
+    .replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1') // Enlaces/imágenes -> texto
+    .replace(/[#*`_~\[\]()]/g, '') // Sintaxis MD restante
     .replace(/\n+/g, ' ') // Saltos línea -> espacios
     .trim();
 }

@@ -4,6 +4,8 @@
  */
 
 import { db } from '../../store/index.js';
+import { escapeHtml } from '../../utils/html.js';
+import { toDateInputValue } from '../../utils/date.js';
 
 const ICONS = {
   download: '<svg class="icon icon--md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
@@ -25,12 +27,6 @@ export function DataManager({ onClose }) {
   let importFile = null;
   let importStatus = null;
   let importMessage = '';
-  
-  function formatFileSize(bytes) {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  }
   
   function render() {
     modal.innerHTML = `
@@ -135,7 +131,7 @@ export function DataManager({ onClose }) {
         <div class="glass" style="padding: var(--s-6); border-radius: var(--r-lg);">
           <h3 style="margin: 0 0 var(--s-2); color: var(--ink);">Importar Datos</h3>
           <p style="margin: 0 0 var(--s-6); color: var(--ink-2); font-size: var(--text-sm);">
-            Selecciona un archivo JSON exportado previamente. <strong>Se fusionarán los datos</strong> (no se elimina lo existente).
+            Selecciona un archivo JSON exportado previamente. <strong>Se combinará con tus datos actuales</strong>: los elementos con el mismo <code>id</code> se actualizan y el resto se añade.
           </p>
           
           <div class="drop-zone" id="drop-zone" style="border: 2px dashed var(--line); border-radius: var(--r-lg); padding: var(--s-8); text-align: center; cursor: pointer; transition: all var(--dur-fast); ${importFile ? 'border-color: var(--accent); background: rgba(59,130,246,0.05);' : ''}">
@@ -144,7 +140,7 @@ export function DataManager({ onClose }) {
               <div style="display: flex; align-items: center; justify-content: center; gap: var(--s-4); color: var(--ink);">
                 ${ICONS.database}
                 <div>
-                  <div style="font-weight: 500;">${importFile.name}</div>
+                  <div style="font-weight: 500;">${escapeHtml(importFile.name)}</div>
                   <div style="font-size: var(--text-xs); color: var(--ink-2);">${formatFileSize(importFile.size)}</div>
                 </div>
               </div>
@@ -157,11 +153,11 @@ export function DataManager({ onClose }) {
           
           ${importStatus === 'success' ? `
             <div style="margin-top: var(--s-4); padding: var(--s-4); background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); border-radius: var(--r-md); color: var(--accent); display: flex; align-items: center; gap: var(--s-2);">
-              <svg class="icon icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ${importMessage}
+              <svg class="icon icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ${escapeHtml(importMessage)}
             </div>
           ` : importStatus === 'error' ? `
             <div style="margin-top: var(--s-4); padding: var(--s-4); background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); border-radius: var(--r-md); color: var(--danger); display: flex; align-items: center; gap: var(--s-2);">
-              <svg class="icon icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> ${importMessage}
+              <svg class="icon icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> ${escapeHtml(importMessage)}
             </div>
           ` : ''}
           
@@ -219,10 +215,6 @@ export function DataManager({ onClose }) {
     modal.querySelectorAll('[data-close]').forEach(btn => {
       btn.addEventListener('click', () => onClose?.());
     });
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) onClose?.();
-    });
-    
     modal.querySelectorAll('[data-tab]').forEach(btn => {
       btn.addEventListener('click', () => {
         activeTab = btn.dataset.tab;
@@ -318,10 +310,13 @@ export function DataManager({ onClose }) {
       
       const a = document.createElement('a');
       a.href = url;
-      a.download = `productividad-backup-${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `productividad-backup-${toDateInputValue(new Date())}.json`;
+      document.body.appendChild(a);
       a.click();
-      
-      URL.revokeObjectURL(url);
+      a.remove();
+
+      // Firefox puede cancelar la descarga si se revoca de inmediato
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
       
       const btn = modal.querySelector('[data-action="export"]');
       btn.innerHTML = '✓ Descargado';
@@ -373,9 +368,26 @@ export function DataManager({ onClose }) {
   
   // Init
   render();
-  
-  modal.destroy = () => {};
-  
+
+  // El listener de overlay se registra UNA sola vez: render() se ejecuta en
+  // cada cambio de pestaña y antes se acumulaba un listener por render.
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) onClose?.();
+  });
+
+  const handleKeydown = (e) => {
+    if (e.key === 'Escape') onClose?.();
+  };
+  document.addEventListener('keydown', handleKeydown);
+
+  let destroyed = false;
+  modal.destroy = () => {
+    if (destroyed) return;
+    destroyed = true;
+    document.removeEventListener('keydown', handleKeydown);
+    modal.remove();
+  };
+
   return modal;
 }
 

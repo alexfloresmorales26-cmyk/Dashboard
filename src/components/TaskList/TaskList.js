@@ -5,6 +5,7 @@
 import { TaskItem } from './TaskItem.js';
 import { TaskForm } from './TaskForm.js';
 import { db } from '../../store/index.js';
+import { escapeHtml, escapeAttr } from '../../utils/html.js';
 
 const ICONS_EXTRA = {
   filter: '<svg class="icon icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>',
@@ -26,10 +27,9 @@ export function TaskList({
   let draggedItem = null;
   let tasks = [];
   
+  let lastCategories = '';
+
   function render() {
-    tasks = db.tasks.filter(filters);
-    if (maxItems) tasks = tasks.slice(0, maxItems);
-    
     container.innerHTML = `
       <div class="task-list__header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--s-4); flex-wrap: wrap; gap: var(--s-2);">
         <div class="task-list__filters" style="display: flex; gap: var(--s-2); flex-wrap: wrap;">
@@ -46,13 +46,12 @@ export function TaskList({
           </select>
           <select class="form-select form-select--sm" data-filter="category" aria-label="Filtrar por categoría" style="min-width: 130px;">
             <option value="">Categoría</option>
-            ${db.tasks.getCategories().map(c => `<option value="${c}">${c}</option>`).join('')}
           </select>
         </div>
         <div class="task-list__search" style="flex: 1; min-width: 200px;">
           <label class="search-input-wrapper" style="width: 100%;">
             ${ICONS_EXTRA.filter}
-            <input type="search" class="form-input form-input--sm" placeholder="Buscar tareas..." data-search aria-label="Buscar tareas" value="${escapeHtml(filters.search)}" style="width: 100%;">
+            <input type="search" class="form-input form-input--sm" placeholder="Buscar tareas..." data-search aria-label="Buscar tareas" value="${escapeAttr(filters.search)}" style="width: 100%;">
           </label>
         </div>
         <button class="btn btn--primary btn--sm" data-add-task style="flex-shrink: 0;">
@@ -60,23 +59,50 @@ export function TaskList({
         </button>
       </div>
       
-      <ul class="list task-list__list" role="list" data-task-list style="${compact ? 'max-height: 400px; overflow: auto;' : ''}">
-        ${tasks.length === 0 ? renderEmptyState() : ''}
-      </ul>
-      
-      ${maxItems && db.tasks.filter(filters).length > maxItems ? `
-        <div class="task-list__more" style="text-align: center; margin-top: var(--s-4);">
-          <button class="btn btn--ghost btn--sm" data-view-all>Ver todas (${db.tasks.filter(filters).length}) →</button>
-        </div>
-      ` : ''}
+      <ul class="list task-list__list" role="list" data-task-list style="${compact ? 'max-height: 400px; overflow: auto;' : ''}"></ul>
+      <div data-task-more></div>
     `;
     
-    // Añadir las tareas como elementos reales (no HTML strings) para conservar
-    // los listeners de checkbox/editar/eliminar
-    const listEl = container.querySelector('[data-task-list]');
-    tasks.forEach(task => listEl?.appendChild(renderTaskItem(task)));
-    
     bindEvents();
+    renderList();
+  }
+  
+  function renderList() {
+    tasks = db.tasks.filter(filters);
+    const total = tasks.length;
+    if (maxItems) tasks = tasks.slice(0, maxItems);
+    
+    // Solo se reemplazan las tareas: la cabecera (incluido el buscador) se
+    // conserva y no pierde el foco.
+    const listEl = container.querySelector('[data-task-list]');
+    if (listEl) {
+      listEl.innerHTML = tasks.length === 0 ? renderEmptyState() : '';
+      tasks.forEach(task => listEl.appendChild(renderTaskItem(task)));
+    }
+    
+    // Sincroniza los selects sin reconstruirlos
+    container.querySelectorAll('[data-filter]').forEach(select => {
+      select.value = filters[select.dataset.filter] || '';
+    });
+    
+    // Refresca las categorías solo si el conjunto cambió
+    const categorySelect = container.querySelector('[data-filter="category"]');
+    const categories = db.tasks.getCategories();
+    if (categorySelect && categories.join('\u0000') !== lastCategories) {
+      lastCategories = categories.join('\u0000');
+      categorySelect.innerHTML = '<option value="">Categoría</option>' +
+        categories.map(c => `<option value="${escapeAttr(c)}">${escapeHtml(c)}</option>`).join('');
+      categorySelect.value = filters.category || '';
+    }
+    
+    const more = container.querySelector('[data-task-more]');
+    if (more) {
+      more.innerHTML = maxItems && total > maxItems ? `
+        <div class="task-list__more" style="text-align: center; margin-top: var(--s-4);">
+          <button class="btn btn--ghost btn--sm" data-view-all>Ver todas (${total}) →</button>
+        </div>
+      ` : '';
+    }
   }
   
   function renderTaskItem(task) {
@@ -114,34 +140,30 @@ export function TaskList({
   function bindEvents() {
     // Filtros
     container.querySelectorAll('[data-filter]').forEach(select => {
-      select.value = filters[select.dataset.filter] || '';
       select.addEventListener('change', (e) => {
         filters[e.target.dataset.filter] = e.target.value;
-        render();
+        renderList();
       });
     });
     
-    // Búsqueda
+    // Búsqueda (solo se refresca la lista: el input conserva el foco)
     const searchInput = container.querySelector('[data-search]');
     if (searchInput) {
       let timeout;
       searchInput.addEventListener('input', (e) => {
+        const value = e.target.value;
         clearTimeout(timeout);
         timeout = setTimeout(() => {
-          filters.search = e.target.value;
-          render();
+          filters.search = value;
+          renderList();
         }, 200);
       });
     }
     
-    // Nueva tarea
-    container.querySelectorAll('[data-add-task]').forEach(btn => {
-      btn.addEventListener('click', () => openModal());
-    });
-    
-    // Ver todas
-    container.querySelector('[data-view-all]')?.addEventListener('click', () => {
-      onNavigate?.('tasks');
+    // Delegación: cubre el botón de la cabecera y el del estado vacío
+    container.addEventListener('click', (e) => {
+      if (e.target.closest('[data-add-task]')) openModal();
+      else if (e.target.closest('[data-view-all]')) onNavigate?.('tasks');
     });
     
     // Drag & Drop para reordenar
@@ -252,23 +274,17 @@ export function TaskList({
     });
   }
   
-  // Suscribirse a cambios
-  const unsub = db.tasks.subscribe(render);
+  // Render inicial (la cabecera se construye una sola vez)
+  render();
+  
+  // Suscribirse a cambios: solo se refresca la lista
+  const unsub = db.tasks.subscribe(renderList);
   
   container.destroy = () => {
     unsub();
   };
   
-  // Render inicial
-  render();
-  
   return container;
-}
-
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
 }
 
 export default TaskList;
